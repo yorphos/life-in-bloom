@@ -96,6 +96,7 @@ To drive regular engagement, the game includes:
 - **Suburban Homes:** Medium-sized houses with multiple rooms and expandable floors
 - **Apartments & Townhouses:** Multi-unit complexes for a community atmosphere
 - **Luxury Mansions:** Large estates with extensive customization options (late-game)
+- **Special Properties:** Houseboats, treehouses, underground bunkers, and other unique dwelling types
 
 #### Building Interface
 
@@ -105,6 +106,7 @@ The building system uses a dedicated "Build Mode" UI that includes:
 - **Placement Tools:** Grid snapping, free placement, rotation, and scaling
 - **Customization Panel:** Color pickers, texture selectors, and lighting options
 - **Save/Load Functions:** Ability to save designs and load templates
+- **Blueprint System:** Save and share designs with other players
 
 #### Furniture & Decorations
 
@@ -112,6 +114,17 @@ The building system uses a dedicated "Build Mode" UI that includes:
 - **Decorative Items:** Plants, artwork, rugs, and accent pieces
 - **Functional Objects:** Interactive items that provide gameplay benefits
 - **Themed Collections:** Furniture sets with cohesive aesthetic styles
+- **Smart Home Features:** Automation and interactive elements
+- **Animated Furniture:** Items with moving parts and interactive elements
+
+#### Advanced Building Features
+
+- **Terrain Modification:** Tools for customizing the property landscape
+- **Collaborative Building:** Multi-player building mode for group projects
+- **Custom Textures:** RGB color picker and advanced material options
+- **Secret Rooms:** Hidden areas and features that can be incorporated into builds
+- **Wear and Tear:** Maintenance requirements for furniture and structures
+- **Themed Sets:** Special furniture collections with unique bonuses when used together
 
 ### Jobs & Career System
 
@@ -184,6 +197,69 @@ The game features various jobs, each with unique gameplay:
 - **Level Benefits:** Unlocking new tools, abilities, and cosmetic options
 - **Mastery Rewards:** Special benefits for reaching maximum levels
 - **Job Switching:** Players can freely change jobs while maintaining progress
+- **Specialization Paths:** Branch into specific career paths within each job
+- **Mentor/Apprentice System:** Experienced players can train newcomers
+- **Job-Specific Challenges:** Special tasks that test mastery of job skills
+- **Workplace Customization:** Personalize work areas with job-specific items
+- **Business Ownership:** High-level progression allows owning businesses
+- **Employee Management:** Hire and manage NPC or player employees
+
+#### New Creative Careers
+
+11. **Fashion Designer**
+
+    - **Gameplay:** Create and sell clothing designs
+    - **Progression:** Unlock fabric types, patterns, and fashion shows
+    - **Location:** Design studios and boutiques
+
+12. **Interior Decorator**
+
+    - **Gameplay:** Design spaces for other players
+    - **Progression:** Unlock exclusive decor items and style options
+    - **Location:** Design firms and model homes
+
+13. **Game Developer**
+    - **Gameplay:** Create mini-games within the game
+    - **Progression:** Unlock more complex game mechanics and features
+    - **Location:** Tech hubs and gaming studios
+
+#### New Service Careers
+
+14. **Tour Guide**
+
+    - **Gameplay:** Lead groups through special locations
+    - **Progression:** Unlock new tour routes and storytelling abilities
+    - **Location:** Tourist destinations and landmarks
+
+15. **Event Planner**
+
+    - **Gameplay:** Organize and run social gatherings
+    - **Progression:** Unlock venue options and special event themes
+    - **Location:** Event spaces and party venues
+
+16. **Personal Trainer**
+    - **Gameplay:** Help players with fitness activities
+    - **Progression:** Unlock new workout routines and equipment
+    - **Location:** Gyms and outdoor fitness areas
+
+#### New Technical Careers
+
+17. **Scientist**
+
+    - **Gameplay:** Research and experiments mini-games
+    - **Progression:** Unlock advanced lab equipment and research topics
+    - **Location:** Laboratories and research centers
+
+18. **Programmer**
+
+    - **Gameplay:** Logic puzzles and debugging challenges
+    - **Progression:** Unlock more complex programming tools and projects
+    - **Location:** Tech companies and home offices
+
+19. **Engineer**
+    - **Gameplay:** Design and build functional systems
+    - **Progression:** Unlock advanced materials and engineering techniques
+    - **Location:** Construction sites and engineering firms
 
 ### Vehicle Ownership & Exploration
 
@@ -193,12 +269,27 @@ The game features various jobs, each with unique gameplay:
 - **Standard Vehicles:** Compact cars, sedans, and SUVs
 - **Specialized Vehicles:** Job-specific vehicles (police cars, taxis, delivery vans)
 - **Luxury Options:** Sports cars and high-end vehicles
+- **Public Transportation:** Buses, trains, and subway systems
+- **Air Vehicles:** Hot air balloons, helicopters, and small planes
+- **Water Vehicles:** Boats, jet skis, and sailboats
 
 #### Customization Options
 
 - **Cosmetic:** Paint colors, decals, rims, and body kits
 - **Performance:** Visual effects that don't affect gameplay balance
 - **Personalization:** Custom license plates and interior decorations
+- **Maintenance System:** Vehicle upkeep and repair requirements
+- **Upgrade System:** Visual and functional improvements
+- **Vehicle Sharing:** Ability to loan vehicles to friends
+
+#### Advanced Vehicle Features
+
+- **Realistic Driving Physics:** Optional advanced driving model
+- **Vehicle-Specific Mini-games:** Challenges tailored to each vehicle type
+- **Racing System:** Competitive tracks and time trials
+- **Obstacle Courses:** Skill-based challenges for different vehicle types
+- **Vehicle Showcase Events:** Display and vote on customized vehicles
+- **Vehicle Collections:** Achievements for owning sets of vehicles
 
 #### World Exploration
 
@@ -208,12 +299,19 @@ The game world is divided into distinct zones:
 - **Commercial:** Shops, restaurants, and office buildings
 - **Industrial:** Factories, warehouses, and service centers
 - **Recreational:** Entertainment venues, malls, and event spaces
+- **Rural/Farm Areas:** Agricultural activities and countryside
+- **Wilderness Zones:** Natural landscapes for exploration
+- **Tourist Destinations:** Unique landmarks and attractions
 
 Dynamic elements enhance the world:
 
 - **Day/Night Cycle:** Affecting lighting and NPC behavior
-- **Weather System:** Rain, snow, and seasonal effects
+- **Weather System:** Rain, snow, and seasonal effects with gameplay impact
 - **Special Events:** Temporary areas and activities
+- **Natural Events:** Meteor showers, aurora borealis, and other phenomena
+- **Wonder Locations:** Unique visuals and special rewards
+- **Challenge Areas:** Locations with special objectives and prizes
+- **Historical Districts:** Themed areas with unique architecture
 
 ### Social & Multiplayer Features
 
@@ -223,18 +321,28 @@ Dynamic elements enhance the world:
 - **Party System:** Forming groups of up to 6 players for activities
 - **House Parties:** Inviting friends to your home for social gatherings
 - **Trading:** Secure exchange of furniture, vehicles, and collectibles
+- **Clubs & Organizations:** Player groups with hierarchies and shared goals
+- **Reputation Systems:** Status within different communities
+- **Collaborative Projects:** Multi-player tasks requiring coordination
 
 #### Communication Tools
 
 - **Text Chat:** Filtered chat system for safe communication
 - **Emotes:** Expressive animations for non-verbal communication
 - **Quick Messages:** Pre-set phrases for common interactions
+- **Proximity Voice Chat:** Optional voice communication with nearby players
+- **Custom Emotes:** Player-created animations and expressions
+- **Mail System:** Offline messaging between players
 
 #### Community Features
 
 - **Events Board:** Announcements for upcoming activities
 - **Leaderboards:** Friendly competition in various categories
 - **Community Challenges:** Collaborative goals with shared rewards
+- **Automated Events:** Scheduled activities that occur regularly
+- **Player-Organized Events:** Tools for players to create their own events
+- **Seasonal Festivals:** Special themed activities during holidays
+- **Competitive Tournaments:** Structured competitions with prizes
 
 ---
 
@@ -277,6 +385,8 @@ Life in Bloom uses a fair monetization model that focuses on cosmetic and conven
 - **All core gameplay** is accessible to free players
 - **Progression systems** are balanced for non-paying players
 - **Premium items** are primarily cosmetic or convenience-based
+- **Try Before You Buy:** Test premium features before purchasing
+- **Clear Value Proposition:** Transparent pricing and bundle benefits
 
 ### Available Purchases
 
@@ -284,6 +394,22 @@ Life in Bloom uses a fair monetization model that focuses on cosmetic and conven
 - **Convenience Passes:** VIP lounge access, bonus daily currency
 - **Premium Bundles:** Themed collections of cosmetic items
 - **Seasonal Specials:** Limited-time cosmetic offerings
+- **Subscription Option:** Optional membership with daily benefits
+- **Battle Pass System:** Seasonal progression tracks with free and premium tiers
+
+### Premium Features
+
+- **Exclusive Customization:** Premium materials, animated decorations, and special effects
+- **Convenience Items:** Multi-job experience boosters and expanded storage options
+- **Social Perks:** Premium party hosting capabilities and VIP areas
+- **Collectibles System:** Limited-edition items with display cases and showcases
+
+### Economy Balancing
+
+- **Currency Flow Optimization:** Balanced sinks and sources for stable economy
+- **Trading Enhancements:** Auction house for rare items and consignment system
+- **Value Preservation:** Items maintain worth through limited availability and utility
+- **Dynamic Pricing:** Some items adjust based on economy metrics
 
 ### Dual Currency System
 
@@ -300,6 +426,7 @@ Life in Bloom uses a fair monetization model that focuses on cosmetic and conven
 - **Job Status:** Current job and XP progress
 - **Quick Access Menu:** Buttons for inventory, building mode, job selection
 - **Notifications:** Alerts for events, achievements, and friend activity
+- **Favorites Bar:** Quick access to frequently used items and actions
 
 ### Key Interfaces
 
@@ -307,15 +434,31 @@ Life in Bloom uses a fair monetization model that focuses on cosmetic and conven
 - **Job Hub:** Career selection and progression tracking
 - **Vehicle Garage:** Car management and customization
 - **Social Panel:** Friend list, party management, and trading
+- **Customizable Interface:** Ability to resize and reposition UI elements
+- **UI Themes:** Different visual styles for the interface
 
 ### Onboarding Experience
 
-- **Tutorial:** Step-by-step introduction to core mechanics
-- **Helper Tips:** Context-sensitive hints for new features
-- **Progressive Complexity:** Gradual introduction of advanced systems
+- **Interactive Tutorial:** Scenario-based learning experiences
+- **Contextual Help:** Dynamic assistance based on player actions
+- **Advanced Tutorials:** Optional deep dives into complex systems
+- **Milestone Rewards:** Incentives for completing early progression
+- **Mentor System:** Pairing new players with experienced ones
+- **In-game Wiki:** Searchable knowledge base for game mechanics
 
 ### Accessibility Features
 
 - **Customizable Controls:** Adjustable key bindings and sensitivity
 - **Text Size Options:** Scalable UI elements
 - **Color Blind Modes:** Alternative color schemes for better visibility
+- **Text-to-Speech:** Narration of important notifications
+- **Alternative Control Schemes:** Different input methods for various needs
+- **Mobile-Specific UI:** Optimized layouts for touch interaction
+
+### Mobile Optimization
+
+- **Touch Controls:** Redesigned interfaces for touch interaction
+- **Gesture Support:** Intuitive gestures for common actions
+- **Performance Settings:** Additional options for low-end devices
+- **Simplified Effects:** Optimized visual effects for mobile
+- **Cross-Platform Features:** Cloud sync for multi-device play

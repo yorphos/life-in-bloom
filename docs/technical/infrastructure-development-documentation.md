@@ -202,9 +202,16 @@ The game uses a structured approach to RemoteEvents and RemoteFunctions:
 ### Client-Side Optimization
 
 - **Asset Streaming:** Loading assets based on proximity and visibility
-- **Level of Detail (LOD):** Simplified models for distant objects
+- **Level of Detail (LOD) System:**
+  - Multiple detail levels for frequently used assets
+  - Dynamic adjustment of model complexity based on distance and viewing angle
+  - Prioritized LOD for high polygon count objects (vehicles, buildings)
 - **Render Distance Management:** Dynamic adjustment based on client performance
 - **Effect Throttling:** Reducing particle effects and visual complexity based on FPS
+- **Rendering Optimizations:**
+  - Occlusion culling for complex interiors
+  - Instanced rendering for repeated objects (trees, street furniture)
+  - Optimized shadow rendering with cascaded shadow maps
 
 ### Server-Side Optimization
 
@@ -212,11 +219,20 @@ The game uses a structured approach to RemoteEvents and RemoteFunctions:
 - **Zone-Based Processing:** Only updating active areas of the game world
 - **Player Clustering:** Optimizing server resources based on player distribution
 - **Heartbeat Optimization:** Efficient use of RunService events
+- **Advanced Asset Streaming:**
+  - Priority-based asset loading (essential vs. decorative)
+  - Asynchronous loading for non-critical assets
+  - Predictive loading system based on player movement direction
 
 ### Memory Management
 
-- **Object Pooling:** Reusing instances instead of creating/destroying
-- **Garbage Collection Awareness:** Minimizing table churn and string concatenation
+- **Object Pooling:**
+  - Reusing instances instead of creating/destroying
+  - More aggressive pooling for frequently instantiated objects
+- **Garbage Collection Awareness:**
+  - Minimizing table churn and string concatenation
+  - Memory profiling in development builds to identify leaks
+  - Garbage collection optimization during low-activity periods
 - **Asset Unloading:** Removing unused assets from memory
 
 ---
@@ -228,19 +244,34 @@ The game uses a structured approach to RemoteEvents and RemoteFunctions:
 - **Authoritative Server Model:** Server validates all game-changing actions
 - **Client Prediction:** Client predicts outcomes but server has final say
 - **Reconciliation:** Correcting client state when it diverges from server
+- **Server-side Movement Validation:** Verifying player movements are physically possible
 
 ### Exploit Prevention
 
 - **Input Validation:** Thorough checking of all client inputs
 - **Rate Limiting:** Preventing action spam and timing exploits
 - **Sanity Checks:** Verifying that actions are physically possible
-- **Anomaly Detection:** Flagging suspicious patterns of behavior
+- **Anomaly Detection:**
+  - Flagging suspicious patterns of behavior
+  - Statistical analysis of player actions
+  - Honeypot systems to identify exploitation attempts
 
 ### Data Protection
 
 - **Secure Storage:** Using appropriate scope for sensitive data
-- **Encryption:** Obfuscating sensitive values when necessary
-- **Access Control:** Limiting script access to only necessary components
+- **Encryption:**
+  - Obfuscating sensitive values when necessary
+  - Enhanced encryption for sensitive player data
+- **Access Control:**
+  - Limiting script access to only necessary components
+  - More granular access controls
+  - Audit logging for all data modifications
+
+### Moderation Tools
+
+- **In-game Reporting:** System with evidence capture for player reports
+- **Admin Dashboard:** Comprehensive tools for moderation actions
+- **Content Filtering:** Automated filtering beyond Roblox's default systems
 
 ---
 
@@ -321,11 +352,26 @@ end
 return SystemName
 ```
 
-### Dependency Management
+### Modular System Design
 
+- **Decoupled Core Systems:** Further separation to improve maintainability
+- **Dependency Injection Framework:** Proper framework for managing dependencies
+- **Standardized Interfaces:** Clear interfaces between systems
 - **Service Locator Pattern:** Central registry for accessing services
-- **Dependency Injection:** Passing required modules to systems that need them
 - **Lazy Loading:** Loading modules only when needed
+
+### Enhanced Data Management
+
+- **Data Sharding:** Support for large player bases
+- **Data Compression:** Optimized network transfers
+- **Robust Migration System:** Handling updates to data structures
+- **Dependency Injection:** Passing required modules to systems that need them
+
+### Networking Enhancements
+
+- **Delta Compression:** Efficient network updates
+- **Bandwidth Adaptation:** Adjusting based on client connection quality
+- **Relevancy System:** Sophisticated filtering of network events
 
 ---
 
@@ -387,6 +433,13 @@ return SystemName
 - **Stress Testing:** Testing under high load conditions
 - **Memory Profiling:** Identifying memory leaks and inefficiencies
 
+### Automated Testing Infrastructure
+
+- **Expanded Unit Testing:** Coverage for all core systems
+- **Automated Integration Tests:** For critical paths
+- **Performance Benchmark Tests:** To catch regressions
+- **Continuous Integration:** Automated test runs on code changes
+
 ---
 
 ## Deployment Procedures
@@ -419,3 +472,26 @@ return SystemName
 - **Version Archiving:** Keeping deployable copies of previous versions
 - **Rollback Triggers:** Clear criteria for when to revert to a previous version
 - **Communication Plan:** How to inform players about emergency changes
+
+## Technical Debt Management
+
+### Code Refactoring Schedule
+
+- **Regular Allocation:** Dedicated time for refactoring in each sprint
+- **Prioritization:** Focus on high-risk or high-impact areas first
+- **Documentation:** Tracking technical debt and progress
+- **Refactoring Goals:** Clear objectives for each refactoring effort
+
+### Architecture Evolution
+
+- **Major Updates Planning:** Roadmap for significant architecture changes
+- **Gradual Migration:** Strategies for incremental implementation
+- **Backward Compatibility:** Layers to support existing functionality
+- **Architecture Reviews:** Regular assessment of current architecture
+
+### Testing Automation
+
+- **Coverage Expansion:** Continuously increasing automated test coverage
+- **Continuous Integration:** Automated testing on code commits
+- **Performance Regression:** Automated detection of performance issues
+- **Test-Driven Development:** Writing tests before implementation for critical systems

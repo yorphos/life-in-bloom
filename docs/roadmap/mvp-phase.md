@@ -326,6 +326,38 @@ The Minimum Viable Product (MVP) phase focuses on implementing the core gameplay
 - [x] Server-client communication is stable
 - [x] Memory usage remains within acceptable limits
 
+## Post-MVP Implementation Priorities
+
+### Short-term (1-3 months post-launch)
+
+#### Performance Optimization
+
+- [ ] Implement basic Level of Detail (LOD) system for high-polygon assets
+- [ ] Add priority-based asset loading for essential vs. decorative items
+- [ ] Optimize memory management with object pooling for frequent objects
+- [ ] Implement basic occlusion culling for complex interiors
+
+#### UI/UX Improvements
+
+- [ ] Enhance tutorial based on initial player feedback
+- [ ] Add contextual help for complex features
+- [ ] Improve navigation and wayfinding in the game world
+- [ ] Refine control schemes based on player feedback
+
+#### Bug Fixes and Stability
+
+- [ ] Address critical bugs identified during initial release
+- [ ] Improve error handling and recovery
+- [ ] Enhance data backup and recovery systems
+- [ ] Optimize network code for better stability
+
+#### Initial Content Expansion
+
+- [ ] Add 1-2 new job types based on player demand
+- [ ] Expand furniture catalog with themed collections
+- [ ] Add more vehicle customization options
+- [ ] Introduce first seasonal event
+
 ---
 
 ## Testing Strategy

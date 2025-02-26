@@ -216,17 +216,89 @@ See [MVP Phase](./mvp-phase.md) for detailed sprint breakdowns.
   - Themed events and activities
   - Major feature additions
   - New jobs or gameplay systems
+  - Recurring annual events
 
 - **Community Engagement:**
   - Regular developer updates
   - Community contests
   - Feedback implementation
+  - Player advisory group consultations
+  - User-generated content showcases
 
 ### Resource Allocation
 
 - **Core Team:** 3-5 developers, 2 artists, 1 designer
 - **Community Management:** 1-2 specialists
 - **QA:** 1-2 testers
+- **Analytics Specialist:** 1 part-time analyst
+
+## Long-term Sustainability
+
+### Community Engagement
+
+- **Player Council:**
+
+  - Rotating player advisory group with diverse representation
+  - Regular feedback sessions with development team
+  - Voting on feature prioritization
+  - Early access to upcoming features for testing
+
+- **User-Generated Content:**
+
+  - Creation marketplace for player-designed items
+  - Tools for players to create and share furniture designs
+  - Regular contests for best designs with in-game rewards
+  - Featured creator program for outstanding contributors
+
+- **Community Events:**
+  - Scheduled community challenges with collaborative goals
+  - Server-wide objectives with shared rewards
+  - Annual game anniversary celebrations
+  - Special events tied to real-world holidays
+
+### Analytics Implementation
+
+- **Player Behavior Tracking:**
+
+  - Analysis of popular activities and game areas
+  - Identification of progression bottlenecks
+  - Measurement of social interaction patterns
+  - Heat maps of player activity across the game world
+
+- **Economy Monitoring:**
+
+  - Currency flow tracking to prevent inflation
+  - Analysis of purchasing patterns
+  - Measurement of item popularity and usage
+  - Dynamic adjustment of economy based on metrics
+
+- **Performance Metrics:**
+  - Client performance monitoring across device types
+  - Server load and response time tracking
+  - Asset loading time measurement
+  - Identification of optimization opportunities
+
+### Content Update Strategy
+
+- **Regular Update Schedule:**
+
+  - Consistent update cadence (weekly, monthly, seasonal)
+  - Published roadmap visible to players
+  - Balance between fixes and new content
+  - Prioritization based on player feedback and metrics
+
+- **Seasonal Framework:**
+
+  - Themed seasonal content rotating annually
+  - Limited-time activities to drive engagement
+  - Seasonal cosmetics and collectibles
+  - Special seasonal jobs and mini-games
+
+- **Major Expansion Planning:**
+  - Larger updates around key milestones
+  - Expansion packs with cohesive themes
+  - Long-term planning for major new systems
+  - Gradual introduction of complex features
 
 ---
 
