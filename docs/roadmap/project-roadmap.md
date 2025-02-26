@@ -81,10 +81,10 @@ The development of Life in Bloom is structured into four main phases, followed b
 
 ### Resource Allocation
 
-- **Programming:** 3 developers
-- **Art & Design:** 2 artists
-- **Game Design:** 1 designer
-- **QA:** 1 tester (part-time)
+- **Programming:** 1 solo developer
+- **Art & Design:** Handled by the solo developer
+- **Game Design:** Handled by the solo developer
+- **QA:** Self-testing by the solo developer
 
 ### Success Criteria
 
@@ -114,11 +114,10 @@ See [MVP Phase](./mvp-phase.md) for detailed sprint breakdowns.
 
 ### Resource Allocation
 
-- **Programming:** 3 developers
-- **Art & Design:** 3 artists
-- **Game Design:** 1 designer
-- **QA:** 2 testers
-- **Economy Design:** 1 specialist (part-time)
+- **Programming:** 1 solo developer
+- **Art & Design:** Handled by the solo developer
+- **Game Design:** Handled by the solo developer
+- **QA:** Self-testing by the solo developer
 
 ### Success Criteria
 
@@ -146,11 +145,10 @@ See [MVP Phase](./mvp-phase.md) for detailed sprint breakdowns.
 
 ### Resource Allocation
 
-- **Programming:** 3 developers
-- **Art & Design:** 2 artists
-- **Game Design:** 1 designer
-- **QA:** 2 testers
-- **Community Management:** 1 specialist
+- **Programming:** 1 solo developer
+- **Art & Design:** Handled by the solo developer
+- **Game Design:** Handled by the solo developer
+- **QA:** Self-testing by the solo developer
 
 ### Success Criteria
 
@@ -178,10 +176,9 @@ See [MVP Phase](./mvp-phase.md) for detailed sprint breakdowns.
 
 ### Resource Allocation
 
-- **Programming:** 3 developers
-- **Art & Design:** 2 artists
-- **QA:** 3 testers
-- **Performance Specialist:** 1 consultant
+- **Programming:** 1 solo developer
+- **Art & Design:** Handled by the solo developer
+- **QA:** Self-testing by the solo developer
 
 ### Success Criteria
 
@@ -227,10 +224,10 @@ See [MVP Phase](./mvp-phase.md) for detailed sprint breakdowns.
 
 ### Resource Allocation
 
-- **Core Team:** 3-5 developers, 2 artists, 1 designer
-- **Community Management:** 1-2 specialists
-- **QA:** 1-2 testers
-- **Analytics Specialist:** 1 part-time analyst
+- **Core Team:** 1 solo developer
+- **Community Management:** Handled by the solo developer
+- **QA:** Self-testing by the solo developer
+- **Analytics:** Handled by the solo developer
 
 ## Long-term Sustainability
 

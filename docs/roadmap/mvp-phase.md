@@ -16,7 +16,7 @@
 The Minimum Viable Product (MVP) phase focuses on implementing the core gameplay systems and features necessary to create a playable prototype of Life in Bloom. This phase will establish the technical foundation, implement basic versions of key gameplay mechanics, and create a small but functional game world.
 
 **Duration:** 8 weeks (4 two-week sprints)  
-**Team Size:** 3 developers, 2 artists, 1 designer, 1 part-time QA tester
+**Team Size:** 1 solo developer handling all aspects of development
 
 **MVP Goals:**
 
@@ -187,12 +187,9 @@ The Minimum Viable Product (MVP) phase focuses on implementing the core gameplay
 - Develop data service for saving/loading
 - Establish remote event system for client-server communication
 - Create UI framework with main HUD elements
-
-**Art Tasks:**
-
-- Basic character models
-- Simple environment assets
-- Placeholder UI elements
+- Create basic character models
+- Design simple environment assets
+- Create placeholder UI elements
 
 **End of Sprint Goal:** Players can move around a simple world with persistent data saving.
 
@@ -208,19 +205,16 @@ The Minimum Viable Product (MVP) phase focuses on implementing the core gameplay
 - House saving and loading
 - Build mode UI
 
-**Technical Tasks:**
+**Art Tasks:**
 
 - Develop grid system for placement
 - Implement furniture placement logic
 - Create customization system for colors and textures
 - Build save/load functionality for houses
 - Develop build mode UI with catalog and controls
-
-**Art Tasks:**
-
-- Basic furniture models (20-30 items)
-- Textures for walls, floors, and furniture
-- Build mode UI elements
+- Create basic furniture models (20-30 items)
+- Design textures for walls, floors, and furniture
+- Create build mode UI elements
 
 **End of Sprint Goal:** Players can build and customize simple houses with basic furniture.
 
@@ -236,7 +230,7 @@ The Minimum Viable Product (MVP) phase focuses on implementing the core gameplay
 - Currency and rewards
 - Job UI
 
-**Technical Tasks:**
+**Tasks:**
 
 - Develop job framework with progression tracking
 - Implement Chef mini-game (cooking puzzle)
@@ -244,12 +238,9 @@ The Minimum Viable Product (MVP) phase focuses on implementing the core gameplay
 - Build Police Officer activities (simple patrol and response)
 - Implement currency system and rewards
 - Develop job selection and progress UI
-
-**Art Tasks:**
-
-- Job-specific locations and props
-- Mini-game UI elements
-- Job uniforms and icons
+- Create job-specific locations and props
+- Design mini-game UI elements
+- Create job uniforms and icons
 
 **End of Sprint Goal:** Players can take on jobs, complete mini-games, earn currency, and progress through job levels.
 
@@ -265,7 +256,7 @@ The Minimum Viable Product (MVP) phase focuses on implementing the core gameplay
 - Bug fixes
 - Tutorial and onboarding
 
-**Technical Tasks:**
+**Tasks:**
 
 - Implement vehicle controls and physics
 - Create vehicle spawning system
@@ -273,12 +264,9 @@ The Minimum Viable Product (MVP) phase focuses on implementing the core gameplay
 - Optimize performance for target devices
 - Fix critical bugs
 - Implement basic tutorial and onboarding
-
-**Art Tasks:**
-
-- Vehicle models and textures
-- Tutorial UI elements
-- Final polish on existing assets
+- Create vehicle models and textures
+- Design tutorial UI elements
+- Apply final polish on existing assets
 
 **End of Sprint Goal:** Complete MVP with all core systems working together, ready for initial testing.
 
@@ -362,30 +350,11 @@ The Minimum Viable Product (MVP) phase focuses on implementing the core gameplay
 
 ## Testing Strategy
 
-### Internal Testing
-
-- Daily developer playtests during implementation
-- Weekly team-wide playtest sessions
-- Bug tracking and prioritization
-- Performance monitoring on target devices
-
-### QA Testing
-
+- Regular self-testing throughout development
 - Focused testing on each core system
 - Integration testing across systems
-- Edge case identification and testing
-- Regression testing after bug fixes
-
-### User Testing
-
-- Small group of testers (5-10) at end of MVP phase
-- Guided testing sessions with specific tasks
-- Feedback collection via surveys and interviews
-- Usability observation and analysis
-
-### Performance Testing
-
-- FPS monitoring across different scenarios
+- Performance monitoring across different scenarios
 - Memory usage tracking
 - Network traffic analysis
-- Load testing with simulated players
+- Small group of external testers (5-10) at end of MVP phase
+- Feedback collection via surveys and interviews
