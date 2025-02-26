@@ -13,6 +13,8 @@
 9. [Testing Methodologies](#testing-methodologies)
 10. [Deployment Procedures](#deployment-procedures)
 11. [Analytics Implementation](#analytics-implementation)
+12. [Roblox Platform Limitations & Mitigations](#roblox-platform-limitations--mitigations)
+13. [Change Management & Versioning](#change-management--versioning)
 
 ---
 
@@ -91,7 +93,8 @@ PlayerData = {
         JoinDate = 0,
         LastLogin = 0,
         PlayTime = 0,
-        Settings = {}
+        Settings = {},
+        SchemaVersion = "1.0" -- For data migration tracking
     },
 
     -- Economy data
@@ -166,11 +169,44 @@ PlayerData = {
 - **Graceful Exit Saving:** Data is saved when players leave the game
 - **Backup System:** Periodic backups to prevent data loss
 
+### DataStore Limitations & Mitigations
+
+- **Write Frequency Limits:**
+
+  - Roblox limits DataStore writes to 6 per minute per key
+  - Implementation of write queue system to batch and prioritize saves
+  - Critical data saved immediately, non-critical data batched
+  - Exponential backoff for retry attempts on failed writes
+
+- **Size Limits:**
+
+  - 4MB limit per key in DataStore
+  - Data compression for large structures
+  - Sharding of player data across multiple keys if needed
+  - Regular data audits to identify and optimize storage usage
+
+- **Throttling Handling:**
+
+  - Monitoring of request budget through GetRequestBudgetForRequestType()
+  - Adaptive saving frequency based on available budget
+  - Client notification of save status with visual indicators
+  - Fallback to local caching when throttled
+
+- **Error Recovery:**
+  - Comprehensive error handling for all DataStore operations
+  - Local caching of data to prevent loss during service interruptions
+  - Transaction logs for critical operations to enable recovery
+  - Auto-backup to secondary keys for critical player data
+
 ### Data Migration & Versioning
 
 - **Schema Versioning:** Each data structure has a version number
 - **Migration Functions:** Code to upgrade data from older versions
 - **Backwards Compatibility:** Ensuring new code works with old data structures
+- **Migration Testing:** Comprehensive test suite for data migration paths
+- **Rollback Capability:** Ability to revert to previous data schema if migration fails
+- **Incremental Migration:** Breaking large migrations into smaller, safer steps
+- **Migration Logging:** Detailed logs of all migration operations for debugging
 
 ---
 
@@ -195,6 +231,25 @@ The game uses a structured approach to RemoteEvents and RemoteFunctions:
 - **Data Compression:** Minimizing payload size for frequent updates
 - **Batched Updates:** Combining multiple small updates into single transmissions
 - **Relevancy Filtering:** Only sending data to clients who need it
+
+### RemoteEvent Throttling Mitigation
+
+- **Rate Limiting System:**
+
+  - Client-side cooldowns for high-frequency events
+  - Server-side validation of event frequency
+  - Queuing system for non-critical events during high traffic
+
+- **Event Prioritization:**
+
+  - Critical gameplay events given priority (movement, interactions)
+  - Non-essential events (cosmetic updates, ambient effects) deprioritized
+  - Adaptive throttling based on server load
+
+- **Error Recovery:**
+  - Retry logic for critical failed events
+  - Graceful degradation of non-essential features during high load
+  - Client-side prediction to maintain responsiveness during delays
 
 ---
 
@@ -251,6 +306,33 @@ The game uses a structured approach to RemoteEvents and RemoteFunctions:
   - Dynamic texture quality adjustment based on available memory
   - Memory usage monitoring and alerting system
 
+### Performance Testing Plan
+
+- **Device Testing Matrix:**
+
+  - Testing across low, medium, and high-end devices
+  - Benchmark suite for consistent performance measurement
+  - Performance regression detection between builds
+
+- **Load Testing:**
+
+  - Simulated high player counts using bots
+  - Stress testing for zone transitions and asset streaming
+  - Server load simulation for peak usage scenarios
+
+- **Monitoring Tools:**
+
+  - FPS counters and performance overlays in development builds
+  - Memory usage tracking across different game activities
+  - Network traffic analysis for bandwidth optimization
+  - Server performance metrics dashboard
+
+- **Optimization Workflow:**
+  - Regular performance review meetings
+  - Prioritized optimization backlog based on impact
+  - Performance budgets for each system and feature
+  - Automated performance testing in CI pipeline
+
 ---
 
 ## Security & Anti-Exploit Measures
@@ -276,6 +358,35 @@ The game uses a structured approach to RemoteEvents and RemoteFunctions:
   - Server-side validation of all critical game mechanics
   - Physics verification for movement and interactions
   - Time-based validation for action sequences
+
+### Known Exploit Scenarios & Countermeasures
+
+- **Movement Exploits:**
+
+  - Speed hacking detection through velocity validation
+  - Teleport detection with position delta thresholds
+  - Noclip prevention with collision validation
+  - Anti-fly measures with gravity and physics checks
+
+- **Remote Event Abuse:**
+
+  - Sequence validation for multi-step actions
+  - Context validation for event triggers
+  - Cooldown enforcement with server-side timers
+  - Parameter range validation for all inputs
+
+- **Economy Exploits:**
+
+  - Transaction logging and auditing
+  - Server authority for all currency operations
+  - Verification of item ownership before trades
+  - Anti-duplication measures for inventory items
+
+- **Building System Exploits:**
+  - Placement validation against grid rules
+  - Cost verification for all building actions
+  - Anti-griefing measures in shared spaces
+  - Property boundary enforcement
 
 ### Data Protection
 
@@ -527,6 +638,8 @@ return SystemName
 - **System Interaction:** Testing how systems work together
 - **Edge Cases:** Focusing on boundary conditions and rare scenarios
 - **Regression Testing:** Ensuring new changes don't break existing functionality
+- **Cross-System Testing:** Explicit testing of interactions between systems
+- **Integration Test Matrix:** Mapping dependencies between systems for comprehensive testing
 
 ### Playtesting
 
@@ -605,6 +718,8 @@ return SystemName
 - **Version Archiving:** Keeping deployable copies of previous versions
 - **Rollback Triggers:** Clear criteria for when to revert to a previous version
 - **Communication Plan:** How to inform players about emergency changes
+- **Data Compatibility:** Ensuring rollbacks don't corrupt player data
+- **Phased Rollback:** Ability to roll back specific systems without full reversion
 
 ## Technical Debt Management
 
@@ -692,3 +807,153 @@ return SystemName
   - Anonymization of personal identifiers
   - Data retention policies
   - Opt-out mechanisms for sensitive tracking
+
+---
+
+## Roblox Platform Limitations & Mitigations
+
+### DataStore Constraints
+
+- **Write Frequency Limits:**
+
+  - Roblox limits DataStore writes to 6 per minute per key
+  - Implementation of write queue system to batch and prioritize saves
+  - Critical data saved immediately, non-critical data batched
+  - Exponential backoff for retry attempts on failed writes
+
+- **Size Limits:**
+
+  - 4MB limit per key in DataStore
+  - Data compression for large structures
+  - Sharding of player data across multiple keys if needed
+  - Regular data audits to identify and optimize storage usage
+
+- **Throttling Handling:**
+  - Monitoring of request budget through GetRequestBudgetForRequestType()
+  - Adaptive saving frequency based on available budget
+  - Client notification of save status with visual indicators
+  - Fallback to local caching when throttled
+
+### Network Limitations
+
+- **RemoteEvent Throttling:**
+
+  - Client-side cooldowns for high-frequency events
+  - Server-side validation of event frequency
+  - Queuing system for non-critical events during high traffic
+  - Prioritization of critical gameplay events
+
+- **Bandwidth Constraints:**
+  - Payload size optimization for all network communications
+  - Compression of large data transfers
+  - Relevancy filtering to minimize unnecessary network traffic
+  - Batching of related updates into single transmissions
+
+### Server Resource Constraints
+
+- **CPU Limitations:**
+
+  - Efficient code optimization for server-side operations
+  - Distribution of heavy computations across multiple frames
+  - Prioritization of critical gameplay systems
+  - Background processing for non-time-critical operations
+
+- **Memory Management:**
+  - Careful object lifecycle management to prevent leaks
+  - Pooling of frequently created/destroyed objects
+  - Aggressive cleanup of temporary data structures
+  - Memory usage monitoring and alerting
+
+### Asset Streaming Issues
+
+- **Content Delivery:**
+
+  - Strategic use of ContentProvider for preloading critical assets
+  - Progressive loading based on player proximity and visibility
+  - Fallback appearance for assets during loading
+  - Caching strategies for frequently used assets
+
+- **Large World Management:**
+  - Zone-based streaming with distance-based detail levels
+  - Instanced interiors to reduce main world complexity
+  - Strategic use of TeleportService for separate experiences
+  - Level of detail (LOD) system for distant objects
+
+### Platform Update Resilience
+
+- **Deprecation Handling:**
+
+  - Monitoring of Roblox release notes and upcoming changes
+  - Wrapper modules around platform APIs for easier updates
+  - Feature detection for conditional code paths
+  - Regular testing on beta channel for early issue detection
+
+- **Compatibility Layers:**
+  - Abstraction layers for platform-specific functionality
+  - Fallback implementations for deprecated features
+  - Version-specific code paths when necessary
+  - Comprehensive testing across Roblox updates
+
+---
+
+## Change Management & Versioning
+
+### Schema Evolution
+
+- **Data Schema Versioning:**
+
+  - Explicit version numbers for all data structures
+  - Migration paths between all consecutive versions
+  - Compatibility layers for handling legacy data
+  - Testing framework for migration validation
+
+- **API Versioning:**
+  - Semantic versioning for all system interfaces
+  - Deprecation notices and transition periods
+  - Documentation of breaking vs. non-breaking changes
+  - Interface stability guarantees for core systems
+
+### Live Environment Updates
+
+- **Zero-Downtime Updates:**
+
+  - Strategies for updating live game without disruption
+  - Feature flags for gradual rollout of new functionality
+  - A/B testing framework for validating changes with subsets of players
+  - Canary deployments for early issue detection
+
+- **Data Migration in Live Environment:**
+  - Incremental migration strategies for active players
+  - Background processing of data updates
+  - Progress tracking and resumability for long migrations
+  - Fallback mechanisms if migration encounters issues
+
+### Rollback Procedures
+
+- **Version Control:**
+
+  - Snapshot system for critical game states
+  - Ability to restore from previous versions
+  - Data compatibility between adjacent versions
+  - Automated verification of rollback integrity
+
+- **Emergency Response:**
+  - Defined criteria for triggering rollbacks
+  - Practiced procedures for emergency situations
+  - Communication templates for player notifications
+  - Post-mortem analysis process for prevention
+
+### Change Documentation
+
+- **Change Log:**
+
+  - Detailed documentation of all significant changes
+  - Categorization by type (feature, fix, improvement)
+  - Impact assessment for each change
+  - Tracking of dependencies between changes
+
+- **Deprecation Policy:**
+  - Clear timeline for feature deprecation
+  - Advance notice to players for significant changes
+  - Migration guides for affected functionality
+  - Legacy support periods for critical features
