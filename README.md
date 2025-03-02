@@ -55,6 +55,23 @@ The game is built using Roblox's platform capabilities with a client-server arch
 - Progression System
 - Economy System
 
+### UI System Architecture
+
+The game uses a modular UI architecture designed for maintainability and consistency:
+
+- **BaseUI:** Foundation layer with utility functions for creating basic UI elements and consistent styling
+- **CoreComponents:** Reusable UI components (stat displays, progress bars, notifications) used throughout the game
+- **Modal System:** Modular window framework using `ModalBase` as a foundation for all dialog windows
+- **Screens:** Full-screen UI layouts including the main game interface and menus
+- **Controllers:** Handle the logic and data flow between game systems and UI elements
+
+Key UI Features:
+- Consistent visual styling with shared color schemes and animations
+- Responsive design that adapts to different screen sizes
+- Streamlined notification system for player feedback
+- Modular components that can be reused across different screens
+- Clean separation between UI presentation and game logic
+
 ### Data Management
 
 Player data is securely stored using Roblox's DataStoreService, with regular auto-saves and backup systems to prevent data loss.
