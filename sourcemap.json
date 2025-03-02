@@ -185,10 +185,6 @@
                             ],
                             "children": [
                                 {
-                                    "name": "Components",
-                                    "className": "Folder"
-                                },
-                                {
                                     "name": "Controllers",
                                     "className": "Folder",
                                     "children": [
@@ -228,10 +224,6 @@
                                             ]
                                         }
                                     ]
-                                },
-                                {
-                                    "name": "Managers",
-                                    "className": "Folder"
                                 },
                                 {
                                     "name": "UI",
