@@ -91,6 +91,17 @@ local function InitializeControllers(): boolean
         -- We don't return false here since this is not critical for gameplay
     end
     
+    -- Player Movement Controller
+    local playerMovementControllerSuccess, playerMovementControllerErrorMsg = pcall(function()
+        local PlayerMovementController = require(script.Controllers.PlayerMovementController)
+        PlayerMovementController.Initialize()
+    end)
+    
+    if not playerMovementControllerSuccess then
+        warn("[CLIENT_WARNING] Player Movement controller initialization failed: " .. tostring(playerMovementControllerErrorMsg))
+        -- We don't return false here since default movement will still work
+    end
+    
     print("All controllers initialized")
     return true
 end

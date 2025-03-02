@@ -96,6 +96,11 @@ The vehicle and exploration systems enable players to navigate and discover the 
 - **Customization**: Modify appearance and features
 - **World Navigation**: Drive through different zones and areas
 - **Discovery**: Find hidden locations and special events
+- **Sprint Toggle**: Press Shift key or use the sprint button to toggle faster movement speed
+  - Increases player movement speed from 16 to 24 studs/second
+  - Visual feedback in UI shows current sprint state
+  - Can be toggled with Left Shift key or sprint button
+  - Conserves energy while providing faster map traversal
 
 #### Player Experience
 
@@ -103,7 +108,11 @@ The vehicle and exploration systems enable players to navigate and discover the 
 2. Save currency for preferred vehicle types
 3. Customize vehicles to express personal style
 4. Explore different areas to discover content and opportunities
-5. Participate in vehicle-based activities and challenges
+5. Use sprint functionality to navigate the world more efficiently
+   - Toggle sprint mode to quickly traverse large areas
+   - Visually track sprint state through UI indicators
+   - Combine with vehicle transportation for optimal map exploration
+6. Participate in vehicle-based activities and challenges
 
 #### Progression Path
 

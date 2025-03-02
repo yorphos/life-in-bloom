@@ -12,6 +12,7 @@ local Players = game:GetService("Players")
 local BaseUI = require(script.Parent.Parent.BaseUI)
 local CoreComponents = require(script.Parent.Parent.Components.CoreComponents)
 local PlayerDataController = require(script.Parent.Parent.Parent.Controllers.PlayerDataController)
+local PlayerMovementController = require(script.Parent.Parent.Parent.Controllers.PlayerMovementController)
 
 -- Modals
 local CareerModal = require(script.Parent.Parent.Modals.CareerModal)
@@ -23,6 +24,7 @@ local COLORS = BaseUI.GetColors()
 
 -- Local variables
 local player = Players.LocalPlayer
+local isSprintActive = false
 
 -- Helper functions to get UI references
 local function GetRef(path)
@@ -353,6 +355,61 @@ function MainScreen.CreateMainUI()
             MainScreen.ShowNotification("Settings", "Settings system is currently in development", "error", 3)
         end
     end)
+    
+    -- Sprint button (circle icon)
+    local sprintButton = Instance.new("ImageButton")
+    sprintButton.Name = "SprintButton"
+    sprintButton.Size = UDim2.new(0, 45, 0, 45)
+    sprintButton.BackgroundColor3 = Color3.fromRGB(76, 175, 80) -- Green for sprint
+    sprintButton.BackgroundTransparency = 0.6 -- More transparent when inactive
+    sprintButton.Image = "rbxassetid://8990866412" -- Sprint icon
+    sprintButton.ImageTransparency = 0
+    sprintButton.Parent = actionButtonsContainer
+    
+    -- Round the sprint button
+    local sprintCorner = Instance.new("UICorner")
+    sprintCorner.CornerRadius = UDim.new(1, 0)
+    sprintCorner.Parent = sprintButton
+
+    BaseUI.AddRef("screens", "main.sprintButton", sprintButton)
+    
+    -- Function to update sprint button appearance
+    local function updateSprintButtonAppearance(enabled)
+        isSprintActive = enabled
+        
+        if isSprintActive then
+            -- Active state: more visible
+            sprintButton.BackgroundTransparency = 0.2
+            sprintButton.BackgroundColor3 = Color3.fromRGB(76, 175, 80) -- Brighter green
+        else
+            -- Inactive state: more transparent
+            sprintButton.BackgroundTransparency = 0.6
+            sprintButton.BackgroundColor3 = Color3.fromRGB(76, 175, 80) -- Dimmer green
+        end
+    end
+    
+    sprintButton.MouseButton1Click:Connect(function()
+        -- Call the PlayerMovementController ToggleSprint function
+        if PlayerMovementController and typeof(PlayerMovementController.ToggleSprint) == "function" then
+            PlayerMovementController.ToggleSprint()
+            -- Button appearance will be updated via the SprintStateChanged event
+        else
+            MainScreen.ShowNotification("Sprint", "Sprint function not available", "error", 3)
+        end
+    end)
+    
+    -- Listen for sprint state changes from the controller
+    if PlayerMovementController.SprintStateChanged then
+        PlayerMovementController.SprintStateChanged.Event:Connect(function(enabled)
+            updateSprintButtonAppearance(enabled)
+            MainScreen.ShowNotification(
+                "Sprint", 
+                enabled and "Sprint mode activated" or "Sprint mode deactivated", 
+                "info", 
+                1.5
+            )
+        end)
+    end
     
     -- Create notification container
     local notificationContainer = Instance.new("Frame")

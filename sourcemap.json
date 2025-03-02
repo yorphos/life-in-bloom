@@ -219,6 +219,13 @@
                                             "filePaths": [
                                                 "src/client\\Controllers\\PlayerDataController.luau"
                                             ]
+                                        },
+                                        {
+                                            "name": "PlayerMovementController",
+                                            "className": "ModuleScript",
+                                            "filePaths": [
+                                                "src/client\\Controllers\\PlayerMovementController.luau"
+                                            ]
                                         }
                                     ]
                                 },
