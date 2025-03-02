@@ -194,9 +194,24 @@ function ModalBase.CreateBaseModal(title, size, parent)
     -- Close on overlay click if enabled
     overlay.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            print("Overlay clicked")
-            screenGui:Destroy()  -- Destroy the entire ScreenGui
-            activeModals[screenGui] = nil
+            -- Check if the click is directly on the overlay and not on the modal
+            local inputPosition = input.Position
+            local modalAbsolutePosition = modal.AbsolutePosition
+            local modalAbsoluteSize = modal.AbsoluteSize
+            
+            -- Calculate if the click is within the modal boundaries
+            local isInModal = 
+                inputPosition.X >= modalAbsolutePosition.X and
+                inputPosition.X <= modalAbsolutePosition.X + modalAbsoluteSize.X and
+                inputPosition.Y >= modalAbsolutePosition.Y and
+                inputPosition.Y <= modalAbsolutePosition.Y + modalAbsoluteSize.Y
+            
+            -- Only close if clicked outside the modal
+            if not isInModal then
+                print("Overlay clicked outside modal, closing")
+                screenGui:Destroy()  -- Destroy the entire ScreenGui
+                activeModals[screenGui] = nil
+            end
         end
     end)
     

@@ -87,9 +87,14 @@ function CareerModal.Show()
     
     -- Add list layout
     local listLayout = Instance.new("UIListLayout")
-    listLayout.SortOrder = Enum.SortOrder.Name
+    listLayout.SortOrder = Enum.SortOrder.LayoutOrder
     listLayout.Padding = UDim.new(0, 10)
     listLayout.Parent = careerList
+    
+    -- Auto-adjust canvas size for career list
+    listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        careerList.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y + 10)
+    end)
     
     -- Right panel (Career Details)
     local detailsPanel = Instance.new("Frame")
@@ -154,7 +159,7 @@ function createDetailsContent(parent)
     local titleLabel = BaseUI.CreateLabel(
         "CareerTitle",
         "",
-        UDim2.new(1, -20, 0, 40),
+        UDim2.new(0.6, -20, 0, 40),
         UDim2.new(0, 10, 0, 10),
         COLORS.TEXT,
         24,
@@ -164,6 +169,35 @@ function createDetailsContent(parent)
     titleLabel.Visible = false
     
     BaseUI.AddRef("modals", "career.titleLabel", titleLabel)
+    
+    -- Action button (moved to top right)
+    local actionButton = BaseUI.CreateStyledButton(
+        "ActionButton",
+        "Select Career",
+        UDim2.new(0, 200, 0, 40),
+        parent
+    )
+    actionButton.Position = UDim2.new(1, -220, 0, 10)
+    actionButton.Visible = false
+    actionButton.ZIndex = 10  -- Ensure button is on top
+    
+    BaseUI.AddRef("modals", "career.actionButton", actionButton)
+    
+    -- Level requirement warning (moved below action button)
+    local levelWarning = BaseUI.CreateLabel(
+        "LevelWarning",
+        "Requires Level: 5",
+        UDim2.new(0, 200, 0, 25),
+        UDim2.new(1, -220, 0, 55),
+        COLORS.WARNING,
+        14,
+        parent
+    )
+    levelWarning.TextXAlignment = Enum.TextXAlignment.Center
+    levelWarning.Visible = false
+    levelWarning.ZIndex = 10  -- Ensure warning is on top
+    
+    BaseUI.AddRef("modals", "career.levelWarning", levelWarning)
     
     -- Career type badge
     local typeBadge = Instance.new("Frame")
@@ -248,10 +282,10 @@ function createDetailsContent(parent)
     BaseUI.AddRef("modals", "career.descriptionBg", descriptionBg)
     BaseUI.AddRef("modals", "career.descriptionText", descriptionText)
     
-    -- Stats section title
+    -- Career Details section title
     local statsTitle = BaseUI.CreateLabel(
         "StatsTitle",
-        "Career Stats",
+        "Career Details",
         UDim2.new(1, -20, 0, 30),
         UDim2.new(0, 10, 0, 230),
         COLORS.TEXT,
@@ -259,47 +293,148 @@ function createDetailsContent(parent)
         parent
     )
     statsTitle.Font = Enum.Font.GothamBold
+    statsTitle.TextXAlignment = Enum.TextXAlignment.Left
     statsTitle.Visible = false
     
     BaseUI.AddRef("modals", "career.statsTitle", statsTitle)
     
-    -- Stats container
-    local statsContainer = Instance.new("Frame")
-    statsContainer.Name = "StatsContainer"
-    statsContainer.Size = UDim2.new(1, -20, 0, 100)
-    statsContainer.Position = UDim2.new(0, 10, 0, 270)
-    statsContainer.BackgroundTransparency = 1
-    statsContainer.Visible = false
+    -- Side-by-side container for abilities and gameplay
+    local detailsContainer = Instance.new("Frame")
+    detailsContainer.Name = "DetailsContainer"
+    detailsContainer.Size = UDim2.new(1, -20, 1, -280)
+    detailsContainer.Position = UDim2.new(0, 10, 0, 270)
+    detailsContainer.BackgroundTransparency = 1
+    detailsContainer.BorderSizePixel = 0
+    detailsContainer.Visible = false
+    detailsContainer.Parent = parent
+    
+    BaseUI.AddRef("modals", "career.detailsContainer", detailsContainer)
+    
+    -- Left side - Abilities container
+    local abilitiesPanel = Instance.new("Frame")
+    abilitiesPanel.Name = "AbilitiesPanel"
+    abilitiesPanel.Size = UDim2.new(0.48, 0, 1, 0)
+    abilitiesPanel.Position = UDim2.new(0, 0, 0, 0)
+    abilitiesPanel.BackgroundColor3 = COLORS.BACKGROUND
+    abilitiesPanel.BorderSizePixel = 0
+    abilitiesPanel.Parent = detailsContainer
+    
+    -- Rounded corners for abilities panel
+    local abilitiesCorner = Instance.new("UICorner")
+    abilitiesCorner.CornerRadius = UDim.new(0, 8)
+    abilitiesCorner.Parent = abilitiesPanel
+    
+    -- Abilities header
+    local abilitiesHeader = BaseUI.CreateLabel(
+        "AbilitiesHeader",
+        "Abilities:",
+        UDim2.new(1, -20, 0, 30),
+        UDim2.new(0, 10, 0, 10),
+        COLORS.TEXT,
+        16,
+        abilitiesPanel
+    )
+    abilitiesHeader.Font = Enum.Font.GothamBold
+    abilitiesHeader.TextXAlignment = Enum.TextXAlignment.Left
+    
+    -- Abilities content container (scrollable)
+    local abilitiesContainer = Instance.new("ScrollingFrame")
+    abilitiesContainer.Name = "AbilitiesContainer"
+    abilitiesContainer.Size = UDim2.new(1, -20, 1, -50)
+    abilitiesContainer.Position = UDim2.new(0, 10, 0, 40)
+    abilitiesContainer.BackgroundTransparency = 1
+    abilitiesContainer.BorderSizePixel = 0
+    abilitiesContainer.ScrollBarThickness = 4
+    abilitiesContainer.ScrollBarImageColor3 = COLORS.PRIMARY
+    abilitiesContainer.Parent = abilitiesPanel
+    
+    -- Add layout for abilities list
+    local abilitiesLayout = Instance.new("UIListLayout")
+    abilitiesLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    abilitiesLayout.Padding = UDim.new(0, 5)
+    abilitiesLayout.Parent = abilitiesContainer
+    
+    -- Auto-adjust canvas size
+    abilitiesLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        abilitiesContainer.CanvasSize = UDim2.new(0, 0, 0, abilitiesLayout.AbsoluteContentSize.Y + 5)
+    end)
+    
+    -- Add padding to ensure content isn't right against the edge
+    local abilitiesPadding = Instance.new("UIPadding")
+    abilitiesPadding.PaddingLeft = UDim.new(0, 5)
+    abilitiesPadding.PaddingRight = UDim.new(0, 5)
+    abilitiesPadding.PaddingTop = UDim.new(0, 5)
+    abilitiesPadding.PaddingBottom = UDim.new(0, 5)
+    abilitiesPadding.Parent = abilitiesContainer
+    
+    BaseUI.AddRef("modals", "career.abilitiesPanel", abilitiesPanel)
+    BaseUI.AddRef("modals", "career.abilitiesContainer", abilitiesContainer)
+    
+    -- Right side - Gameplay container
+    local gameplayPanel = Instance.new("Frame")
+    gameplayPanel.Name = "GameplayPanel"
+    gameplayPanel.Size = UDim2.new(0.48, 0, 1, 0)
+    gameplayPanel.Position = UDim2.new(0.52, 0, 0, 0)
+    gameplayPanel.BackgroundColor3 = COLORS.BACKGROUND
+    gameplayPanel.BorderSizePixel = 0
+    gameplayPanel.Parent = detailsContainer
+    
+    -- Rounded corners for gameplay panel
+    local gameplayCorner = Instance.new("UICorner")
+    gameplayCorner.CornerRadius = UDim.new(0, 8)
+    gameplayCorner.Parent = gameplayPanel
+    
+    -- Gameplay header
+    local gameplayHeader = BaseUI.CreateLabel(
+        "GameplayHeader",
+        "Gameplay Style:",
+        UDim2.new(1, -20, 0, 30),
+        UDim2.new(0, 10, 0, 10),
+        COLORS.TEXT,
+        16,
+        gameplayPanel
+    )
+    gameplayHeader.Font = Enum.Font.GothamBold
+    gameplayHeader.TextXAlignment = Enum.TextXAlignment.Left
+    
+    -- Gameplay content container
+    local gameplayContainer = Instance.new("ScrollingFrame")
+    gameplayContainer.Name = "GameplayContainer"
+    gameplayContainer.Size = UDim2.new(1, -20, 1, -50)
+    gameplayContainer.Position = UDim2.new(0, 10, 0, 40)
+    gameplayContainer.BackgroundTransparency = 1
+    gameplayContainer.BorderSizePixel = 0
+    gameplayContainer.ScrollBarThickness = 4
+    gameplayContainer.ScrollBarImageColor3 = COLORS.PRIMARY
+    gameplayContainer.Parent = gameplayPanel
+    
+    -- Add layout for gameplay traits
+    local gameplayLayout = Instance.new("UIListLayout")
+    gameplayLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    gameplayLayout.Padding = UDim.new(0, 5)
+    gameplayLayout.Parent = gameplayContainer
+    
+    -- Auto-adjust canvas size
+    gameplayLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        gameplayContainer.CanvasSize = UDim2.new(0, 0, 0, gameplayLayout.AbsoluteContentSize.Y + 5)
+    end)
+    
+    -- Add padding to ensure content isn't right against the edge
+    local gameplayPadding = Instance.new("UIPadding")
+    gameplayPadding.PaddingLeft = UDim.new(0, 5)
+    gameplayPadding.PaddingRight = UDim.new(0, 5)
+    gameplayPadding.PaddingTop = UDim.new(0, 5)
+    gameplayPadding.PaddingBottom = UDim.new(0, 5)
+    gameplayPadding.Parent = gameplayContainer
+    
+    BaseUI.AddRef("modals", "career.gameplayPanel", gameplayPanel)
+    BaseUI.AddRef("modals", "career.gameplayContainer", gameplayContainer)
+    
+    -- Legacy stats container ref for backward compatibility
+    local statsContainer = Instance.new("Folder")
+    statsContainer.Name = "StatsContainer" 
     statsContainer.Parent = parent
-    
     BaseUI.AddRef("modals", "career.statsContainer", statsContainer)
-    
-    -- Action button
-    local actionButton = BaseUI.CreateStyledButton(
-        "ActionButton",
-        "Select Career",
-        UDim2.new(0, 200, 0, 50),
-        parent
-    )
-    actionButton.Position = UDim2.new(0.5, -100, 1, -70)
-    actionButton.Visible = false
-    
-    BaseUI.AddRef("modals", "career.actionButton", actionButton)
-    
-    -- Level requirement warning
-    local levelWarning = BaseUI.CreateLabel(
-        "LevelWarning",
-        "Requires Level: 5",
-        UDim2.new(0, 200, 0, 30),
-        UDim2.new(0.5, -100, 1, -110),
-        COLORS.WARNING,
-        14,
-        parent
-    )
-    levelWarning.TextXAlignment = Enum.TextXAlignment.Center
-    levelWarning.Visible = false
-    
-    BaseUI.AddRef("modals", "career.levelWarning", levelWarning)
 end
 
 -- Populate the career list with options
@@ -325,58 +460,200 @@ function populateCareerList()
     local playerData = PlayerDataController.GetDataByPath("Player") or {}
     local currentCareer = playerData and playerData.career and playerData.career.id
     
-    -- For each career, create a list item
+    -- Group careers by type
+    local careersByType = {}
     for careerId, careerInfo in pairs(careerData) do
-        -- Create career item button
-        local itemButton = Instance.new("TextButton")
-        itemButton.Name = careerId
-        itemButton.Size = UDim2.new(1, -10, 0, 50)
-        itemButton.BackgroundColor3 = COLORS.BACKGROUND
-        itemButton.BorderSizePixel = 0
-        itemButton.Text = ""
-        itemButton.Parent = careerList
+        local careerType = careerInfo.type or "Other"
+        if not careersByType[careerType] then
+            careersByType[careerType] = {}
+        end
+        table.insert(careersByType[careerType], {id = careerId, info = careerInfo})
+    end
+    
+    -- Sort career types alphabetically
+    local sortedTypes = {}
+    for careerType, _ in pairs(careersByType) do
+        table.insert(sortedTypes, careerType)
+    end
+    table.sort(sortedTypes)
+    
+    -- Track expanded states for accordion sections
+    if not _G.careerAccordionStates then
+        _G.careerAccordionStates = {}
+        -- Default all sections to expanded
+        for _, careerType in ipairs(sortedTypes) do
+            _G.careerAccordionStates[careerType] = true
+        end
+    end
+    
+    -- Create accordion sections for each career type
+    local layoutIndex = 1
+    for _, careerType in ipairs(sortedTypes) do
+        local typeGroup = careersByType[careerType]
         
-        -- Add rounded corners
-        local itemCorner = Instance.new("UICorner")
-        itemCorner.CornerRadius = UDim.new(0, 6)
-        itemCorner.Parent = itemButton
-        
-        -- Highlight current career
-        if currentCareer and currentCareer == careerId then
-            itemButton.BackgroundColor3 = COLORS.PRIMARY:Lerp(Color3.new(1, 1, 1), 0.2)
+        -- Skip empty groups
+        if #typeGroup == 0 then
+            continue
         end
         
-        -- Career name
-        local nameLabel = BaseUI.CreateLabel(
-            "NameLabel",
-            careerInfo.name,
-            UDim2.new(1, -20, 0, 20),
-            UDim2.new(0, 10, 0, 5),
-            COLORS.TEXT,
+        -- Determine if this accordion is expanded
+        local isExpanded = _G.careerAccordionStates[careerType] or false
+        
+        -- Create accordion header
+        local accordionHeader = Instance.new("Frame")
+        accordionHeader.Name = "TypeHeader_" .. careerType
+        accordionHeader.Size = UDim2.new(1, -10, 0, 40)
+        accordionHeader.BackgroundColor3 = COLORS.PRIMARY
+        accordionHeader.BorderSizePixel = 0
+        accordionHeader.LayoutOrder = layoutIndex
+        accordionHeader.Parent = careerList
+        layoutIndex = layoutIndex + 1
+        
+        -- Add rounded corners to header
+        local headerCorner = Instance.new("UICorner")
+        headerCorner.CornerRadius = UDim.new(0, 6)
+        headerCorner.Parent = accordionHeader
+        
+        -- Type name
+        local typeLabel = BaseUI.CreateLabel(
+            "TypeName",
+            careerType,
+            UDim2.new(1, -50, 1, 0),
+            UDim2.new(0, 10, 0, 0),
+            Color3.new(1, 1, 1),
             16,
-            itemButton
+            accordionHeader
         )
-        nameLabel.Font = Enum.Font.GothamBold
+        typeLabel.Font = Enum.Font.GothamBold
+        typeLabel.TextXAlignment = Enum.TextXAlignment.Left
         
-        -- Create career type label
-        BaseUI.CreateLabel(
-            "TypeLabel",
-            careerInfo.type,
-            UDim2.new(1, -20, 0, 16),
-            UDim2.new(0, 10, 0, 25),
-            COLORS.TEXT_SECONDARY,
-            14,
-            itemButton
-        )
+        -- Create toggle indicator
+        local toggleIndicator = Instance.new("TextLabel")
+        toggleIndicator.Name = "ToggleIndicator"
+        toggleIndicator.Size = UDim2.new(0, 30, 0, 30)
+        toggleIndicator.Position = UDim2.new(1, -40, 0.5, -15)
+        toggleIndicator.BackgroundTransparency = 1
+        toggleIndicator.Text = isExpanded and "▼" or "►"
+        toggleIndicator.TextColor3 = Color3.new(1, 1, 1)
+        toggleIndicator.TextSize = 16
+        toggleIndicator.Font = Enum.Font.GothamBold
+        toggleIndicator.Parent = accordionHeader
         
-        -- Handle click
-        itemButton.MouseButton1Click:Connect(function()
-            displayCareerDetails(careerId, careerInfo)
+        -- Make header clickable
+        local headerButton = Instance.new("TextButton")
+        headerButton.Name = "HeaderButton"
+        headerButton.Size = UDim2.new(1, 0, 1, 0)
+        headerButton.BackgroundTransparency = 1
+        headerButton.Text = ""
+        headerButton.Parent = accordionHeader
+        
+        -- Set color based on type
+        if careerType == "Business" then
+            accordionHeader.BackgroundColor3 = COLORS.SUCCESS
+        elseif careerType == "Creative" then
+            accordionHeader.BackgroundColor3 = COLORS.INFO
+        elseif careerType == "Service" then
+            accordionHeader.BackgroundColor3 = COLORS.WARNING
+        elseif careerType == "Technical" then
+            accordionHeader.BackgroundColor3 = COLORS.PRIMARY
+        end
+        
+        -- Create container for career items
+        local careerContainer = Instance.new("Frame")
+        careerContainer.Name = "CareerContainer_" .. careerType
+        careerContainer.Size = UDim2.new(1, -20, 0, 0)
+        careerContainer.Position = UDim2.new(0, 10, 0, 0)
+        careerContainer.BackgroundTransparency = 1
+        careerContainer.BorderSizePixel = 0
+        careerContainer.LayoutOrder = layoutIndex
+        careerContainer.AutomaticSize = Enum.AutomaticSize.Y
+        careerContainer.Visible = isExpanded
+        careerContainer.Parent = careerList
+        layoutIndex = layoutIndex + 1
+        
+        -- Add list layout to career container
+        local containerLayout = Instance.new("UIListLayout")
+        containerLayout.SortOrder = Enum.SortOrder.Name
+        containerLayout.Padding = UDim.new(0, 10)
+        containerLayout.Parent = careerContainer
+        
+        -- Auto-size based on content
+        containerLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            if careerContainer.Visible then
+                careerContainer.Size = UDim2.new(1, -20, 0, containerLayout.AbsoluteContentSize.Y)
+            else
+                careerContainer.Size = UDim2.new(1, -20, 0, 0)
+            end
         end)
         
-        -- Adjust list canvas size
-        careerList.CanvasSize = UDim2.new(0, 0, 0, (#careerList:GetChildren() - 1) * 60)
+        -- Populate career items
+        for _, careerData in ipairs(typeGroup) do
+            local careerId = careerData.id
+            local careerInfo = careerData.info
+            
+            -- Create career item button
+            local itemButton = Instance.new("TextButton")
+            itemButton.Name = careerId
+            itemButton.Size = UDim2.new(1, 0, 0, 50)
+            itemButton.BackgroundColor3 = COLORS.BACKGROUND
+            itemButton.BorderSizePixel = 0
+            itemButton.Text = ""
+            itemButton.Parent = careerContainer
+            
+            -- Add rounded corners
+            local itemCorner = Instance.new("UICorner")
+            itemCorner.CornerRadius = UDim.new(0, 6)
+            itemCorner.Parent = itemButton
+            
+            -- Highlight current career
+            if currentCareer and currentCareer == careerId then
+                itemButton.BackgroundColor3 = COLORS.PRIMARY:Lerp(Color3.new(1, 1, 1), 0.2)
+            end
+            
+            -- Career name
+            local nameLabel = BaseUI.CreateLabel(
+                "NameLabel",
+                careerInfo.name,
+                UDim2.new(1, -20, 0, 20),
+                UDim2.new(0, 10, 0, 15),
+                COLORS.TEXT,
+                16,
+                itemButton
+            )
+            nameLabel.Font = Enum.Font.GothamBold
+            
+            -- Handle click
+            itemButton.MouseButton1Click:Connect(function()
+                displayCareerDetails(careerId, careerInfo)
+            end)
+        end
+        
+        -- Toggle accordion when header is clicked
+        headerButton.MouseButton1Click:Connect(function()
+            isExpanded = not isExpanded
+            _G.careerAccordionStates[careerType] = isExpanded
+            
+            toggleIndicator.Text = isExpanded and "▼" or "►"
+            careerContainer.Visible = isExpanded
+            
+            -- Force layout update
+            careerList.CanvasSize = UDim2.new(0, 0, 0, 0)
+            task.defer(function()
+                local careerListLayout = careerList:FindFirstChildOfClass("UIListLayout")
+                if careerListLayout and careerListLayout.AbsoluteContentSize then
+                    careerList.CanvasSize = UDim2.new(0, 0, 0, careerListLayout.AbsoluteContentSize.Y + 10)
+                end
+            end)
+        end)
     end
+    
+    -- Force canvas size update
+    task.defer(function()
+        local careerListLayout = careerList:FindFirstChildOfClass("UIListLayout")
+        if careerListLayout and careerListLayout.AbsoluteContentSize then
+            careerList.CanvasSize = UDim2.new(0, 0, 0, careerListLayout.AbsoluteContentSize.Y + 10)
+        end
+    end)
 end
 
 -- Display career details in the right panel
@@ -392,7 +669,9 @@ function displayCareerDetails(careerId, careerInfo)
     local descriptionBg = BaseUI.GetRef("modals", "career.descriptionBg")
     local descriptionText = BaseUI.GetRef("modals", "career.descriptionText")
     local statsTitle = BaseUI.GetRef("modals", "career.statsTitle")
-    local statsContainer = BaseUI.GetRef("modals", "career.statsContainer")
+    local detailsContainer = BaseUI.GetRef("modals", "career.detailsContainer")
+    local abilitiesContainer = BaseUI.GetRef("modals", "career.abilitiesContainer")
+    local gameplayContainer = BaseUI.GetRef("modals", "career.gameplayContainer")
     local actionButton = BaseUI.GetRef("modals", "career.actionButton")
     local levelWarning = BaseUI.GetRef("modals", "career.levelWarning")
     
@@ -415,6 +694,8 @@ function displayCareerDetails(careerId, careerInfo)
             typeBadge.BackgroundColor3 = COLORS.INFO
         elseif careerInfo.type == "Service" then
             typeBadge.BackgroundColor3 = COLORS.WARNING
+        elseif careerInfo.type == "Technical" then
+            typeBadge.BackgroundColor3 = COLORS.PRIMARY
         else
             typeBadge.BackgroundColor3 = COLORS.PRIMARY
         end
@@ -433,71 +714,124 @@ function displayCareerDetails(careerId, careerInfo)
         descriptionBg.Visible = true
     end
     
+    -- Show section title
     if statsTitle then
         statsTitle.Visible = true
     end
     
-    -- Clear previous stats
-    if statsContainer then
-        for _, child in pairs(statsContainer:GetChildren()) do
-            child:Destroy()
+    -- Show details container
+    if detailsContainer then
+        detailsContainer.Visible = true
+    end
+    
+    -- Clear and display abilities
+    if abilitiesContainer then
+        -- Clear existing abilities
+        for _, child in pairs(abilitiesContainer:GetChildren()) do
+            if not child:IsA("UIListLayout") and not child:IsA("UIPadding") then
+                child:Destroy()
+            end
         end
         
-        -- Add stat bars
-        local statY = 0
-        for statName, statValue in pairs(careerInfo.stats) do
-            -- Create a simple stat bar display
-            local statContainer = Instance.new("Frame")
-            statContainer.Name = "Stat_" .. statName
-            statContainer.Size = UDim2.new(1, 0, 0, 25)
-            statContainer.Position = UDim2.new(0, 0, 0, statY)
-            statContainer.BackgroundTransparency = 1
-            statContainer.Parent = statsContainer
-            
-            -- Stat name
-            local nameLabel = BaseUI.CreateLabel(
-                "StatName",
-                statName .. ":",
-                UDim2.new(0.4, 0, 1, 0),
-                UDim2.new(0, 0, 0, 0),
+        if careerInfo.abilities and #careerInfo.abilities > 0 then
+            -- List abilities
+            for i, ability in ipairs(careerInfo.abilities) do
+                local abilityLabel = BaseUI.CreateLabel(
+                    "Ability_" .. i,
+                    "• " .. ability,
+                    UDim2.new(1, -10, 0, 0),
+                    UDim2.new(0, 5, 0, 0),
+                    COLORS.TEXT_SECONDARY,
+                    14,
+                    abilitiesContainer
+                )
+                abilityLabel.TextXAlignment = Enum.TextXAlignment.Left
+                abilityLabel.TextWrapped = true
+                abilityLabel.LayoutOrder = i
+                abilityLabel.AutomaticSize = Enum.AutomaticSize.Y
+            end
+        else
+            -- No abilities message
+            local noAbilitiesLabel = BaseUI.CreateLabel(
+                "NoAbilitiesMsg",
+                "No special abilities for this career",
+                UDim2.new(1, -10, 0, 0),
+                UDim2.new(0, 5, 0, 0),
                 COLORS.TEXT_SECONDARY,
                 14,
-                statContainer
+                abilitiesContainer
             )
-            nameLabel.TextXAlignment = Enum.TextXAlignment.Left
-            
-            -- Stat bar background
-            local barBg = Instance.new("Frame")
-            barBg.Name = "BarBackground"
-            barBg.Size = UDim2.new(0.6, -10, 0, 15)
-            barBg.Position = UDim2.new(0.4, 5, 0, 5)
-            barBg.BackgroundColor3 = COLORS.BACKGROUND
-            barBg.BorderSizePixel = 0
-            barBg.Parent = statContainer
-            
-            -- Add rounded corners
-            local barCorner = Instance.new("UICorner")
-            barCorner.CornerRadius = UDim.new(0, 3)
-            barCorner.Parent = barBg
-            
-            -- Stat bar fill
-            local barFill = Instance.new("Frame")
-            barFill.Name = "BarFill"
-            barFill.Size = UDim2.new(statValue/100, 0, 1, 0)
-            barFill.Position = UDim2.new(0, 0, 0, 0)
-            barFill.BackgroundColor3 = COLORS.PRIMARY
-            barFill.BorderSizePixel = 0
-            barFill.Parent = barBg
-            
-            -- Add rounded corners to fill
-            local fillCorner = Instance.new("UICorner")
-            fillCorner.CornerRadius = UDim.new(0, 3)
-            fillCorner.Parent = barFill
-            
-            statY = statY + 35
+            noAbilitiesLabel.TextXAlignment = Enum.TextXAlignment.Left
+            noAbilitiesLabel.TextWrapped = true
+            noAbilitiesLabel.AutomaticSize = Enum.AutomaticSize.Y
+        end
+    end
+    
+    -- Clear and display gameplay info
+    if gameplayContainer then
+        -- Clear existing gameplay info
+        for _, child in pairs(gameplayContainer:GetChildren()) do
+            if not child:IsA("UIListLayout") and not child:IsA("UIPadding") then
+                child:Destroy()
+            end
         end
         
-        statsContainer.Visible = true
+        if careerInfo.gameplay then
+            -- Create gameplay info
+            local index = 1
+            for trait, value in pairs(careerInfo.gameplay) do
+                local traitContainer = Instance.new("Frame")
+                traitContainer.Name = "Trait_" .. trait
+                traitContainer.Size = UDim2.new(1, -10, 0, 0)
+                traitContainer.BackgroundTransparency = 1
+                traitContainer.LayoutOrder = index
+                traitContainer.AutomaticSize = Enum.AutomaticSize.Y
+                traitContainer.Parent = gameplayContainer
+                
+                -- Trait name
+                local traitLabel = BaseUI.CreateLabel(
+                    "TraitName",
+                    trait:sub(1,1):upper() .. trait:sub(2) .. ":",
+                    UDim2.new(0.4, 0, 0, 0),
+                    UDim2.new(0, 0, 0, 0),
+                    COLORS.TEXT_SECONDARY,
+                    14,
+                    traitContainer
+                )
+                traitLabel.TextXAlignment = Enum.TextXAlignment.Left
+                traitLabel.AutomaticSize = Enum.AutomaticSize.Y
+                
+                -- Trait value
+                local valueLabel = BaseUI.CreateLabel(
+                    "TraitValue",
+                    value,
+                    UDim2.new(0.6, -5, 0, 0),
+                    UDim2.new(0.4, 0, 0, 0),
+                    COLORS.TEXT,
+                    14,
+                    traitContainer
+                )
+                valueLabel.TextXAlignment = Enum.TextXAlignment.Left
+                valueLabel.TextWrapped = true
+                valueLabel.AutomaticSize = Enum.AutomaticSize.Y
+                
+                index = index + 1
+            end
+        else
+            -- No gameplay info message
+            local noGameplayLabel = BaseUI.CreateLabel(
+                "NoGameplayMsg",
+                "No gameplay information available",
+                UDim2.new(1, -10, 0, 0),
+                UDim2.new(0, 5, 0, 0),
+                COLORS.TEXT_SECONDARY,
+                14,
+                gameplayContainer
+            )
+            noGameplayLabel.TextXAlignment = Enum.TextXAlignment.Left
+            noGameplayLabel.TextWrapped = true
+            noGameplayLabel.AutomaticSize = Enum.AutomaticSize.Y
+        end
     end
     
     -- Set up action button
