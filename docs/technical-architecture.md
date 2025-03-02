@@ -30,6 +30,28 @@ The game architecture is divided into distinct client and server components:
 
 ## Core Systems
 
+### Game Data System
+
+The game data system centralizes management of all static game information:
+
+- **GameDataService (Server):** Authoritative source for all static game data
+  - Loads and validates data from ModuleScripts
+  - Provides secure access to data via RemoteFunctions
+  - Handles caching and optimization of frequently accessed data
+  - Manages tiered access based on player permissions
+
+- **GameDataController (Client):** Client-side interface for accessing game data
+  - Provides a clean API for UI components
+  - Implements client-side caching to minimize network requests
+  - Maintains synchronization with server-side data
+
+- **Data Categories:**
+  - Careers and jobs information
+  - Items and inventory definitions
+  - Housing and furniture catalogs
+  - Vehicle specifications
+  - Game settings and configurations
+
 ### Building System
 
 The house building system allows players to create and customize their homes:
@@ -43,10 +65,21 @@ The house building system allows players to create and customize their homes:
 
 The job system manages player careers and progression:
 
-- **Job Manager:** Controls job switching, status, and availability
-- **Mini-Game Framework:** Provides foundation for job-specific gameplay
-- **Progression Tracker:** Manages XP, levels, and unlocks for each job
-- **Reward System:** Handles job compensation and special rewards
+- **Job Manager:** Controls job switching, status, and availability across all career types
+- **Mini-Game Framework:** Provides foundation for diverse job-specific gameplay mechanics:
+  - Rhythm-based (Chef, Musician)
+  - Precision-based (Doctor, Electrician)
+  - Puzzle-solving (Mechanic, Programmer, Engineer)
+  - Driving simulation (Taxi Driver)
+  - Memory challenges (Barista, Teacher, Tour Guide)
+  - Action sequences (Firefighter, Police Officer)
+  - Design interfaces (Architect, Fashion Designer, Interior Decorator)
+  - Strategy management (Store Manager, Mayor, Hotel Manager)
+  - Organizational tasks (Event Planner, Real Estate Agent, Retail Worker)
+  - Creative expression (Artist)
+- **Unified Progression System:** Ensures all careers follow identical XP requirements and reward structures
+- **Career-Specific Abilities:** Manages unique gameplay mechanics for each career that differentiate the experience without affecting economic balance
+- **Standardized Activity Framework:** Common structure for all job activities that ensures consistent reward calculations across career types
 
 ### Vehicle System
 

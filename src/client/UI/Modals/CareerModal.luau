@@ -12,6 +12,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BaseUI = require(script.Parent.Parent.BaseUI)
 local ModalBase = require(script.Parent.ModalBase)
 local PlayerDataController = require(script.Parent.Parent.Parent.Controllers.PlayerDataController)
+local GameDataController = require(script.Parent.Parent.Parent.Controllers.GameDataController)
 
 -- Constants
 local COLORS = BaseUI.GetColors()
@@ -310,12 +311,12 @@ function populateCareerList()
     for _, child in pairs(careerList:GetChildren()) do
         if not child:IsA("UIListLayout") then
             child:Destroy()
-                end
-            end
+        end
+    end
     
-    -- Get career data
-    local careerData = ReplicatedStorage:FindFirstChild("GameData"):FindFirstChild("Careers")
-    if not careerData then
+    -- Get career data using GameDataController
+    local careerData = GameDataController.GetAllCareers()
+    if not careerData or next(careerData) == nil then
         warn("Career data not found")
         return
     end
@@ -325,60 +326,56 @@ function populateCareerList()
     local currentCareer = playerData and playerData.career and playerData.career.id
     
     -- For each career, create a list item
-    for _, career in pairs(careerData:GetChildren()) do
-        if career:IsA("ModuleScript") then
-            local careerInfo = require(career)
-            
-            -- Create career item button
-            local itemButton = Instance.new("TextButton")
-            itemButton.Name = career.Name
-            itemButton.Size = UDim2.new(1, -10, 0, 50)
-            itemButton.BackgroundColor3 = COLORS.BACKGROUND
-            itemButton.BorderSizePixel = 0
-            itemButton.Text = ""
-            itemButton.Parent = careerList
-            
-            -- Add rounded corners
-            local itemCorner = Instance.new("UICorner")
-            itemCorner.CornerRadius = UDim.new(0, 6)
-            itemCorner.Parent = itemButton
-            
-            -- Highlight current career
-            if currentCareer and currentCareer == career.Name then
-                itemButton.BackgroundColor3 = COLORS.PRIMARY:Lerp(Color3.new(1, 1, 1), 0.2)
-            end
-            
-            -- Career name
-            local nameLabel = BaseUI.CreateLabel(
-                "NameLabel",
-                careerInfo.name,
-                UDim2.new(1, -20, 0, 20),
-                UDim2.new(0, 10, 0, 5),
-                COLORS.TEXT,
-                16,
-                itemButton
-            )
-            nameLabel.Font = Enum.Font.GothamBold
-            
-            -- Create career type label
-            BaseUI.CreateLabel(
-                "TypeLabel",
-                careerInfo.type,
-                UDim2.new(1, -20, 0, 16),
-                UDim2.new(0, 10, 0, 25),
-                COLORS.TEXT_SECONDARY,
-                14,
-                itemButton
-            )
-            
-            -- Handle click
-            itemButton.MouseButton1Click:Connect(function()
-                displayCareerDetails(career.Name, careerInfo)
-            end)
-            
-            -- Adjust list canvas size
-            careerList.CanvasSize = UDim2.new(0, 0, 0, (#careerList:GetChildren() - 1) * 60)
+    for careerId, careerInfo in pairs(careerData) do
+        -- Create career item button
+        local itemButton = Instance.new("TextButton")
+        itemButton.Name = careerId
+        itemButton.Size = UDim2.new(1, -10, 0, 50)
+        itemButton.BackgroundColor3 = COLORS.BACKGROUND
+        itemButton.BorderSizePixel = 0
+        itemButton.Text = ""
+        itemButton.Parent = careerList
+        
+        -- Add rounded corners
+        local itemCorner = Instance.new("UICorner")
+        itemCorner.CornerRadius = UDim.new(0, 6)
+        itemCorner.Parent = itemButton
+        
+        -- Highlight current career
+        if currentCareer and currentCareer == careerId then
+            itemButton.BackgroundColor3 = COLORS.PRIMARY:Lerp(Color3.new(1, 1, 1), 0.2)
         end
+        
+        -- Career name
+        local nameLabel = BaseUI.CreateLabel(
+            "NameLabel",
+            careerInfo.name,
+            UDim2.new(1, -20, 0, 20),
+            UDim2.new(0, 10, 0, 5),
+            COLORS.TEXT,
+            16,
+            itemButton
+        )
+        nameLabel.Font = Enum.Font.GothamBold
+        
+        -- Create career type label
+        BaseUI.CreateLabel(
+            "TypeLabel",
+            careerInfo.type,
+            UDim2.new(1, -20, 0, 16),
+            UDim2.new(0, 10, 0, 25),
+            COLORS.TEXT_SECONDARY,
+            14,
+            itemButton
+        )
+        
+        -- Handle click
+        itemButton.MouseButton1Click:Connect(function()
+            displayCareerDetails(careerId, careerInfo)
+        end)
+        
+        -- Adjust list canvas size
+        careerList.CanvasSize = UDim2.new(0, 0, 0, (#careerList:GetChildren() - 1) * 60)
     end
 end
 
@@ -601,19 +598,29 @@ function setupDataListener()
         dataListenerDisconnect()
     end
     
+    -- Listen for player career data changes
     dataListenerDisconnect = PlayerDataController.ListenForData("career", function()
         -- Refresh career list
         populateCareerList()
         
         -- Refresh career details if one is selected
         if selectedCareer then
-            local careerData = ReplicatedStorage:FindFirstChild("GameData"):FindFirstChild("Careers")
-            if careerData then
-                local careerModule = careerData:FindFirstChild(selectedCareer)
-                if careerModule then
-                    local careerInfo = require(careerModule)
-                    displayCareerDetails(selectedCareer, careerInfo)
-                end
+            local careerInfo = GameDataController.GetCareerById(selectedCareer)
+            if careerInfo then
+                displayCareerDetails(selectedCareer, careerInfo)
+            end
+        end
+    end)
+    
+    -- Also listen for game data (career definitions) changes
+    GameDataController.ListenForData("Careers", function()
+        populateCareerList()
+        
+        -- Refresh career details if one is selected
+        if selectedCareer then
+            local careerInfo = GameDataController.GetCareerById(selectedCareer)
+            if careerInfo then
+                displayCareerDetails(selectedCareer, careerInfo)
             end
         end
     end)

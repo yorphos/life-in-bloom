@@ -8,8 +8,6 @@ print("localScript LOADED: Client init.client.lua") -- Debug print to confirm sc
 -- Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
-local StarterPlayer = game:GetService("StarterPlayer")
-local StarterPlayerScripts = StarterPlayer.StarterPlayerScripts
 
 print("SERVICES LOADED") -- Debug print after services are loaded
 
@@ -17,7 +15,7 @@ print("SERVICES LOADED") -- Debug print after services are loaded
 type RemotesStatus = {
     eventsFound: boolean,
     functionsFound: boolean,
-    missingEvents: {string}?,
+    missingEvents: {string},
     retry: number
 }
 
@@ -49,35 +47,47 @@ local function InitializeControllers(): boolean
     end
     
     -- Player Data Controller
-    local success, errorMsg = pcall(function()
+    local playerDataControllerSuccess, playerDataControllerErrorMsg = pcall(function()
         local PlayerDataController = require(script.Controllers.PlayerDataController)
         PlayerDataController.Initialize()
     end)
     
-    if not success then
-        warn("[CLIENT_ERROR] Controller initialization failed: " .. tostring(errorMsg))
+    if not playerDataControllerSuccess then
+        warn("[CLIENT_ERROR] Controller initialization failed: " .. tostring(playerDataControllerErrorMsg))
         return false
     end
     
+    -- Game Data Controller (for static game data)
+    local gameDataControllersuccess, gameDataControllerErrorMsg = pcall(function()
+        local GameDataController = require(script.Controllers.GameDataController)
+        GameDataController.Initialize()
+    end)
+    
+    if not gameDataControllersuccess then
+        warn("[CLIENT_ERROR] Game data controller initialization failed: " .. tostring(gameDataControllerErrorMsg))
+        -- We continue even if this fails, as it's not critical for initial gameplay
+        -- The controller will retry loading data when needed
+    end
+    
     -- Main UI Controller (depends on PlayerDataController)
-    local success, errorMsg = pcall(function()
+    local mainUIControllerSuccess, mainUIControllerErrorMsg = pcall(function()
         local MainUIController = require(script.Controllers.MainUIController)
         MainUIController.Initialize()
     end)
     
-    if not success then
-        warn("[CLIENT_ERROR] UI controller initialization failed: " .. tostring(errorMsg))
+    if not mainUIControllerSuccess then
+        warn("[CLIENT_ERROR] UI controller initialization failed: " .. tostring(mainUIControllerErrorMsg))
         return false
     end
     
     -- Debug GUI Controller
-    local success, errorMsg = pcall(function()
+    local debugUIControllerSuccess, debugUIErrorMsg = pcall(function()
         local DebugGUIController = require(script.Controllers.DebugGUIController)
         DebugGUIController.Initialize()
     end)
     
-    if not success then
-        warn("[CLIENT_WARNING] Debug GUI controller initialization failed: " .. tostring(errorMsg))
+    if not debugUIControllerSuccess then
+        warn("[CLIENT_WARNING] Debug GUI controller initialization failed: " .. tostring(debugUIErrorMsg))
         -- We don't return false here since this is not critical for gameplay
     end
     
@@ -159,7 +169,7 @@ local function WaitForResources(): RemotesStatus
             end
         end
         
-        if #status.missingEvents > 0 then
+        if status.missingEvents and #status.missingEvents > 0 then
             warn("[CLIENT_ERROR] Missing critical RemoteEvents: " .. table.concat(status.missingEvents, ", "))
         end
     end

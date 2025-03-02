@@ -381,7 +381,6 @@ function DataService.Initialize()
     
     -- Handle player joining to send initial data
     Players.PlayerAdded:Connect(function(player)
-        local userId = player.UserId
         
         -- Wait for player to fully load
         player.CharacterAdded:Wait()

@@ -4,7 +4,6 @@
 ]]
 
 -- Services
-local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
 
@@ -65,7 +64,7 @@ local function SetupRemotes(): RemotesSetupResult
             }
             
             for _, eventName in ipairs(criticalEvents) do
-                if not result.eventsFolder:FindFirstChild(eventName) then
+                if result.eventsFolder and not result.eventsFolder:FindFirstChild(eventName) then
                     local event = Instance.new("RemoteEvent")
                     event.Name = eventName
                     event.Parent = result.eventsFolder
@@ -107,7 +106,7 @@ local function SetupRemotes(): RemotesSetupResult
             }
             
             for _, funcName in ipairs(criticalFunctions) do
-                if not result.functionsFolder:FindFirstChild(funcName) then
+                if result.functionsFolder and not result.functionsFolder:FindFirstChild(funcName) then
                     local func = Instance.new("RemoteFunction")
                     func.Name = funcName
                     func.Parent = result.functionsFolder
@@ -120,14 +119,14 @@ local function SetupRemotes(): RemotesSetupResult
     if not success then
         result.success = false
         result.error = "Failed to setup remote folders: " .. tostring(errorMsg)
-        warn("[SERVER_ERROR] " .. result.error)
+        warn("[SERVER_ERROR] " .. (result.error or "Unknown error"))
     end
     
     return result
 end
 
 -- Initialize all services
-local function InitializeServices(): {string: boolean}
+local function InitializeServices(): {[string]: boolean}
     local serviceStatuses = {}
     
     -- Data Services
@@ -144,11 +143,25 @@ local function InitializeServices(): {string: boolean}
         print("[SERVER] DataService initialized")
     end
     
+    -- Game Data Service
+    local success, errorMsg = pcall(function()
+        local GameDataService = require(script.Services.GameDataService)
+        GameDataService.Initialize()
+        serviceStatuses["GameDataService"] = true
+    end)
+    
+    if not success then
+        serviceStatuses["GameDataService"] = false
+        warn("[SERVER_ERROR] Failed to initialize GameDataService: " .. tostring(errorMsg))
+    else
+        print("[SERVER] GameDataService initialized")
+    end
+    
     return serviceStatuses
 end
 
 -- Initialize all systems
-local function InitializeSystems(): {string: boolean}
+local function InitializeSystems(): {[string]: boolean}
     local systemStatuses = {}
     
     -- Player Manager (handles player lifecycle)

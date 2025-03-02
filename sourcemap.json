@@ -83,6 +83,13 @@
                                     "filePaths": [
                                         "src/server\\Services\\DataService.luau"
                                     ]
+                                },
+                                {
+                                    "name": "GameDataService",
+                                    "className": "ModuleScript",
+                                    "filePaths": [
+                                        "src/server\\Services\\GameDataService.luau"
+                                    ]
                                 }
                             ]
                         },
@@ -116,6 +123,40 @@
                                     "className": "ModuleScript",
                                     "filePaths": [
                                         "src/server\\Systems\\ProgressionManager.luau"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "GameData",
+                            "className": "Folder",
+                            "children": [
+                                {
+                                    "name": "CareersData",
+                                    "className": "ModuleScript",
+                                    "filePaths": [
+                                        "src/server\\GameData\\CareersData.luau"
+                                    ]
+                                },
+                                {
+                                    "name": "ItemsData",
+                                    "className": "ModuleScript",
+                                    "filePaths": [
+                                        "src/server\\GameData\\ItemsData.luau"
+                                    ]
+                                },
+                                {
+                                    "name": "FurnitureData",
+                                    "className": "ModuleScript",
+                                    "filePaths": [
+                                        "src/server\\GameData\\FurnitureData.luau"
+                                    ]
+                                },
+                                {
+                                    "name": "VehiclesData",
+                                    "className": "ModuleScript",
+                                    "filePaths": [
+                                        "src/server\\GameData\\VehiclesData.luau"
                                     ]
                                 }
                             ]
@@ -159,6 +200,13 @@
                                             ]
                                         },
                                         {
+                                            "name": "GameDataController",
+                                            "className": "ModuleScript",
+                                            "filePaths": [
+                                                "src/client\\Controllers\\GameDataController.luau"
+                                            ]
+                                        },
+                                        {
                                             "name": "MainUIController",
                                             "className": "ModuleScript",
                                             "filePaths": [
@@ -173,6 +221,10 @@
                                             ]
                                         }
                                     ]
+                                },
+                                {
+                                    "name": "Managers",
+                                    "className": "Folder"
                                 },
                                 {
                                     "name": "UI",

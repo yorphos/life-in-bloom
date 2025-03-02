@@ -195,6 +195,146 @@ GameState = {
 }
 ```
 
+## Static Game Data Management
+
+In Life in Bloom, all static game data is managed through consolidated ModuleScripts that define all entries of each data type.
+
+### Game Data Architecture
+
+Static game data is structured as a collection of ModuleScripts, with one ModuleScript per data type:
+
+```lua
+-- CareersData.luau example
+return {
+    Chef = {
+        id = "Chef",
+        name = "Master Chef",
+        type = "Creative",
+        description = "Create culinary masterpieces in restaurants around town",
+        image = "rbxassetid://12345678",
+        levelRequired = 2,
+        abilities = {
+            "QuickPrep", -- Cook dishes faster
+            "RecipeMastery", -- Unlock special recipes 
+            "QualityIngredients" -- Use better ingredients for higher quality meals
+        },
+        gameplay = {
+            style = "Rhythm",
+            difficulty = "Medium",
+            pacing = "Fast"
+        }
+    },
+    
+    Doctor = {
+        id = "Doctor",
+        name = "Medical Doctor",
+        type = "Service",
+        description = "Diagnose and treat patients in the hospital and clinic",
+        image = "rbxassetid://12345681",
+        levelRequired = 5,
+        abilities = {
+            "QuickDiagnosis", -- Faster identification of patient symptoms
+            "SteadyHands", -- Better precision in treatment mini-games
+            "BedSideManners" -- Improved patient satisfaction
+        },
+        gameplay = {
+            style = "Precision",
+            difficulty = "Hard",
+            pacing = "Variable"
+        }
+    }
+    
+    -- Additional careers...
+}
+```
+
+### Career Data Structure
+
+The career data structure emphasizes gameplay differences rather than statistical advantages:
+
+1. **Base Information**
+   - `id`: Unique identifier for the career
+   - `name`: Display name shown to players
+   - `type`: Category (Service, Technical, Creative, Management)
+   - `description`: Text explanation of the career
+
+2. **Requirements**
+   - `levelRequired`: Minimum player level needed to access this career
+   - `image`: Asset ID for the career icon
+
+3. **Gameplay Attributes**
+   - `abilities`: Array of unique gameplay mechanics that differentiate the career
+   - `gameplay`: Object containing attributes that define how the career plays
+     - `style`: The primary interaction pattern (Rhythm, Precision, Puzzle, etc.)
+     - `difficulty`: General challenge level (Easy, Medium, Hard, Variable)
+     - `pacing`: Speed of gameplay (Fast, Medium, Slow, Variable)
+
+### Gameplay Style Categories
+
+Careers are differentiated by their gameplay style:
+
+1. **Rhythm**: Timing-based gameplay requiring precise synchronization (Chef, Musician)
+2. **Precision**: Accuracy-focused gameplay requiring careful control (Doctor, Electrician, Artist)
+3. **Puzzle**: Problem-solving gameplay with multiple solutions (Mechanic, Programmer, Engineer)
+4. **Driving**: Movement and navigation-focused gameplay (Taxi Driver)
+5. **Memory**: Recall and recognition gameplay (Barista, Teacher, Tour Guide)
+6. **Action**: Fast-paced, reflexive gameplay (Firefighter, Police Officer)
+7. **Design**: Creative, expressive gameplay (Architect, Fashion Designer, Interior Decorator)
+8. **Strategy**: Planning and resource management gameplay (Store Manager, Mayor, Hotel Manager)
+9. **Organization**: Task prioritization and scheduling gameplay (Event Planner, Real Estate Agent, Retail Worker)
+
+All careers follow the same progression curve and provide equal economic rewards, ensuring player choice is based on gameplay preference rather than economic advantage.
+
+### Data Loading Process
+
+Static game data is loaded during server initialization:
+
+1. The `GameDataService` initializes on server startup
+2. Each data type is loaded from its respective ModuleScript
+3. Data is validated and cached on the server
+4. Client requests access data through `RemoteFunctions`
+
+### Data Access Pattern
+
+Data access follows a consistent pattern for both server and client:
+
+**Server-side:**
+```lua
+local GameDataService = require(ServerScriptService.Server.Services.GameDataService)
+local allCareers = GameDataService.GetAllCareers()
+local chefData = GameDataService.GetCareerById("Chef")
+```
+
+**Client-side:**
+```lua
+local GameDataController = require(Players.LocalPlayer.PlayerScripts.Client.Controllers.GameDataController)
+local allCareers = GameDataController.GetAllCareers()
+local chefData = GameDataController.GetCareerById("Chef")
+```
+
+### Data Update Patterns
+
+For static game data that rarely changes:
+
+1. **Initial Load:**
+   - All static data is loaded when the server starts
+   - Clients receive data on demand or during initialization
+
+2. **Game Updates:**
+   - Updates to static data typically occur during game updates
+   - No real-time synchronization is needed for truly static data
+
+For semi-dynamic game data:
+
+1. **Controlled Updates:**
+   - Server can push updates to clients when static data changes
+   - GameDataController listens for update notifications
+   - UI components register for change notifications
+
+2. **Versioning:**
+   - Each data category includes a version number
+   - Clients can check if their cached data is current
+
 ## Data Persistence
 
 ### DataStore Strategy

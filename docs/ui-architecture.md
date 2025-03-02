@@ -163,6 +163,59 @@ Manage the flow between data and UI:
 3. Data changes are propagated back to UI elements
 4. PlayerDataController provides real-time updates to UI
 
+### Access Patterns for Different Data Types
+
+UI components should follow specific patterns when accessing different types of data:
+
+#### Player Data
+
+UI components should never access player data directly. Instead:
+
+1. Request data through PlayerDataController
+2. Register listeners for data changes
+3. Update UI when data changes are detected
+
+```lua
+-- Example: Accessing player data
+local playerMoney = PlayerDataController.GetDataByPath("Progression.Currency")
+
+-- Example: Listening for changes
+local disconnect = PlayerDataController.ListenForData("Progression.Currency", function(newValue)
+    -- Update UI with new value
+    currencyDisplay.Text = tostring(newValue)
+end)
+
+-- Clean up when no longer needed
+disconnect()
+```
+
+#### Game Data (Static)
+
+For static game data (careers, items, vehicles, etc.):
+
+1. Request data through GameDataController
+2. Cache results when appropriate
+3. Handle loading states gracefully
+
+```lua
+-- Example: Accessing game data
+local allCareers = GameDataController:GetAllCareers()
+
+-- Example: Getting specific data
+local chefCareer = GameDataController:GetCareerById("Chef")
+
+-- Example: Checking requirements
+local canSelectCareer = GameDataController:CanSelectCareer(playerId, "Chef")
+```
+
+#### Real-time Game State
+
+For dynamic game state that changes frequently:
+
+1. Use dedicated controllers for specific systems
+2. Implement appropriate update mechanisms (polling vs. events)
+3. Consider performance implications for high-frequency updates
+
 ## Best Practices
 
 1. **Component Composition**: Build complex UIs from simple components
