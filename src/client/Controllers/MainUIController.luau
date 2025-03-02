@@ -7,16 +7,27 @@ local MainUIController = {}
 
 -- Services
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Remote Events - directly exposed at the top level
+MainUIController.NotifyPlayer = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("NotifyPlayer") 
+MainUIController.NewUnlock = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("NewUnlock")
 
 -- Modules
 local PlayerDataController = require(script.Parent.PlayerDataController)
 
--- UI Modules
-local MainScreen = require(script.Parent.Parent.UI.Screens.MainScreen)
+-- UI Modules - use lazy loading for MainScreen to avoid cyclic dependencies
+local MainScreen
 local CareerModal = require(script.Parent.Parent.UI.Modals.CareerModal)
 local HousingModal = require(script.Parent.Parent.UI.Modals.HousingModal)
 local SettingsModal = require(script.Parent.Parent.UI.Modals.SettingsModal)
+local InventoryModal = require(script.Parent.Parent.UI.Modals.InventoryModal)
 local ModalBase = require(script.Parent.Parent.UI.Modals.ModalBase)
+
+-- Helper function to lazy-load MainScreen
+if not MainScreen then
+    MainScreen = require(script.Parent.Parent.UI.Screens.MainScreen)
+end
 
 -- Initialize the Main UI
 function MainUIController.Initialize()
@@ -37,6 +48,23 @@ function MainUIController.Initialize()
     -- Create UI components
     MainScreen.CreateMainUI()
     
+    -- Register modal callbacks
+    MainScreen.RegisterModalCallback("Inventory", function()
+        return MainUIController.ShowInventoryModal()
+    end)
+    
+    MainScreen.RegisterModalCallback("Career", function()
+        return MainUIController.ShowCareerModal()
+    end)
+    
+    MainScreen.RegisterModalCallback("Housing", function()
+        return MainUIController.ShowHousingModal()
+    end)
+    
+    MainScreen.RegisterModalCallback("Settings", function()
+        return MainUIController.ShowSettingsModal()
+    end)
+    
     -- Connect stat listeners for UI updates
     MainScreen.ConnectStatListeners()
     
@@ -55,11 +83,6 @@ function MainUIController.Initialize()
                 "success",
                 10
             )
-            
-            -- Mark player as no longer new
-            -- This would typically be saved server-side via a RemoteEvent
-            -- local markPlayerEvent = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("MarkPlayerStat")
-            -- markPlayerEvent:FireServer("IsNewPlayer", false)
         end
     end)
     
@@ -79,6 +102,33 @@ function MainUIController.Initialize()
         -- Career data is handled directly by CareerModal when it's open
     end)
     
+    -- Set up notification handlers
+    if MainUIController.NotifyPlayer then
+        MainUIController.NotifyPlayer.OnClientEvent:Connect(function(title, message, notifyType, duration)
+            MainScreen.ShowNotification(title, message, notifyType, duration)
+        end)
+    end
+    
+    if MainUIController.NewUnlock then
+        MainUIController.NewUnlock.OnClientEvent:Connect(function(unlockType, unlockId, unlockData)
+            -- Handle new unlock notification
+            local title = "New Unlock!"
+            local message = "You've unlocked a new " .. unlockType
+            
+            if unlockType == "career" and unlockData and unlockData.name then
+                message = "You've unlocked the " .. unlockData.name .. " career!"
+            elseif unlockType == "item" and unlockData and unlockData.name then
+                message = "You've unlocked the " .. unlockData.name .. " item!"
+            elseif unlockType == "furniture" and unlockData and unlockData.name then
+                message = "You've unlocked the " .. unlockData.name .. " furniture!"
+            elseif unlockType == "vehicle" and unlockData and unlockData.name then
+                message = "You've unlocked the " .. unlockData.name .. " vehicle!"
+            end
+            
+            MainScreen.ShowNotification(title, message, "success", 10)
+        end)
+    end
+    
     print("MainUIController: UI initialization complete")
     return true
 end
@@ -96,6 +146,11 @@ end
 -- Show Settings Modal
 function MainUIController.ShowSettingsModal()
     SettingsModal.Show()
+end
+
+-- Show Inventory Modal
+function MainUIController.ShowInventoryModal()
+    InventoryModal.Show()
 end
 
 -- Show notification

@@ -14,10 +14,8 @@ local CoreComponents = require(script.Parent.Parent.Components.CoreComponents)
 local PlayerDataController = require(script.Parent.Parent.Parent.Controllers.PlayerDataController)
 local PlayerMovementController = require(script.Parent.Parent.Parent.Controllers.PlayerMovementController)
 
--- Modals
-local CareerModal = require(script.Parent.Parent.Modals.CareerModal)
-local SettingsModal = require(script.Parent.Parent.Modals.SettingsModal)
-local InventoryModal = require(script.Parent.Parent.Modals.InventoryModal)
+-- MainUIController will be required when needed to avoid cyclic dependencies
+local MainUIController
 
 -- Constants
 local COLORS = BaseUI.GetColors()
@@ -35,6 +33,22 @@ end
 function MainScreen.ShowNotification(title, message, type, duration)
     local notificationContainer = GetRef("notificationContainer")
     CoreComponents.CreateNotification(title, message, type, duration, notificationContainer)
+end
+
+-- Function to handle modal opening through a callback approach
+local modalCallbacks = {}
+
+function MainScreen.RegisterModalCallback(modalType, callback)
+    modalCallbacks[modalType] = callback
+end
+
+function MainScreen.OpenModal(modalType, ...)
+    if modalCallbacks[modalType] then
+        return modalCallbacks[modalType](...)
+    else
+        MainScreen.ShowNotification("Error", modalType .. " modal not available", "error", 3)
+        return false
+    end
 end
 
 -- Create main UI
@@ -172,7 +186,7 @@ function MainScreen.CreateMainUI()
         "Health", 
         PlayerDataController.GetDataByPath("Stats", "Health") or 100,
         PlayerDataController.GetDataByPath("Stats", "MaxHealth") or 100,
-        Color3.fromRGB(235, 64, 52), -- Red
+        COLORS.HEALTH,
         UDim2.new(1, 0, 0, 15)
     )
     healthBar.container.LayoutOrder = 1
@@ -186,7 +200,7 @@ function MainScreen.CreateMainUI()
         "Energy", 
         PlayerDataController.GetDataByPath("Stats", "Energy") or 100,
         PlayerDataController.GetDataByPath("Stats", "MaxEnergy") or 100,
-        Color3.fromRGB(76, 209, 55), -- Green
+        COLORS.ENERGY,
         UDim2.new(1, 0, 0, 15)
     )
     energyBar.container.LayoutOrder = 2
@@ -200,7 +214,7 @@ function MainScreen.CreateMainUI()
         "Mood", 
         PlayerDataController.GetDataByPath("Stats", "Mood") or 100,
         PlayerDataController.GetDataByPath("Stats", "MaxMood") or 100,
-        Color3.fromRGB(255, 198, 42), -- Yellow
+        COLORS.MOOD,
         UDim2.new(1, 0, 0, 15)
     )
     moodBar.container.LayoutOrder = 3
@@ -272,17 +286,12 @@ function MainScreen.CreateMainUI()
     BaseUI.AddRef("screens", "main.inventoryBadgeText", badgeText)
     
     inventoryButton.MouseButton1Click:Connect(function()
-        -- Call the InventoryModal show function
-        if InventoryModal and typeof(InventoryModal.Show) == "function" then
-            InventoryModal.Show()
-            
-            -- Hide notification badge when inventory is opened
-            if inventoryBadge.Visible then
-                inventoryBadge.Visible = false
-                badgeText.Text = "0"
-            end
-        else
-            MainScreen.ShowNotification("Inventory", "Inventory system is currently in development", "error", 3)
+        MainScreen.OpenModal("Inventory")
+        
+        -- Hide notification badge when inventory is opened
+        if inventoryBadge.Visible then
+            inventoryBadge.Visible = false
+            badgeText.Text = "0"
         end
     end)
     
@@ -307,26 +316,13 @@ function MainScreen.CreateMainUI()
         -- Print debug info but don't show notification unless there's an error
         print("Career button clicked")
         
-        -- Check if CareerModal exists
-        if not CareerModal then
-            print("ERROR: CareerModal module not found")
-            MainScreen.ShowNotification("Error", "Career module not found", "error", 3)
-        end
+        local success, error = pcall(function()
+            MainScreen.OpenModal("Career")
+        end)
         
-        -- Call Show function with error handling
-        if typeof(CareerModal.Show) == "function" then
-            print("Calling CareerModal.Show()")
-            local success, error = pcall(function()
-                CareerModal.Show()
-            end)
-            
-            if not success then
-                print("ERROR when calling CareerModal.Show():", error)
-                MainScreen.ShowNotification("Error", "Failed to open career panel", "error", 3)
-            end
-        else
-            print("ERROR: CareerModal.Show is not a function")
-            MainScreen.ShowNotification("Error", "Career panel function not available", "error", 3)
+        if not success then
+            print("ERROR when opening Career modal:", error)
+            MainScreen.ShowNotification("Error", "Failed to open career panel", "error", 3)
         end
     end)
     
@@ -348,12 +344,7 @@ function MainScreen.CreateMainUI()
     BaseUI.AddRef("screens", "main.settingsButton", settingsButton)
     
     settingsButton.MouseButton1Click:Connect(function()
-        -- Call the SettingsModal show function
-        if SettingsModal and typeof(SettingsModal.Show) == "function" then
-            SettingsModal.Show()
-        else
-            MainScreen.ShowNotification("Settings", "Settings system is currently in development", "error", 3)
-        end
+        MainScreen.OpenModal("Settings")
     end)
     
     -- Sprint button (circle icon)

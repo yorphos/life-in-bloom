@@ -587,9 +587,9 @@ function populateCareerList()
         end)
         
         -- Populate career items
-        for _, careerData in ipairs(typeGroup) do
-            local careerId = careerData.id
-            local careerInfo = careerData.info
+        for _, career in ipairs(typeGroup) do
+            local careerId = career.id
+            local careerInfo = career.info
             
             -- Create career item button
             local itemButton = Instance.new("TextButton")
@@ -881,47 +881,35 @@ end
 
 -- Handle career selection
 function selectCareer(careerId)
-    -- This would typically call a remote function
-    local RemoteFunctions = ReplicatedStorage:FindFirstChild("RemoteFunctions")
-    if RemoteFunctions then
-        local SelectCareerFunc = RemoteFunctions:FindFirstChild("SelectCareer")
-        if SelectCareerFunc then
-            local success, result = pcall(function()
-                return SelectCareerFunc:InvokeServer(careerId)
-            end)
-            
-            if success and result then
-                print("Career selected successfully:", careerId)
-                
-                -- Update career list to show new selection
-                local careerList = BaseUI.GetRef("modals", "career.careerList")
-                if careerList then
-                    for _, button in pairs(careerList:GetChildren()) do
-                        if button:IsA("TextButton") then
-                            if button.Name == careerId then
-                                button.BackgroundColor3 = COLORS.PRIMARY:Lerp(Color3.new(1, 1, 1), 0.2)
-                            else
-                                button.BackgroundColor3 = COLORS.BACKGROUND
-                            end
-                        end
+    -- Use the PlayerDataController to handle the remote call
+    local success, message = PlayerDataController.SelectCareer(careerId)
+    
+    if success then
+        print("Career selected successfully:", careerId)
+        
+        -- Update career list to show new selection
+        local careerList = BaseUI.GetRef("modals", "career.careerList")
+        if careerList then
+            for _, button in pairs(careerList:GetChildren()) do
+                if button:IsA("TextButton") then
+                    if button.Name == careerId then
+                        button.BackgroundColor3 = COLORS.PRIMARY:Lerp(Color3.new(1, 1, 1), 0.2)
+                    else
+                        button.BackgroundColor3 = COLORS.BACKGROUND
                     end
                 end
-                
-                -- Update action button
-                local actionButton = BaseUI.GetRef("modals", "career.actionButton")
-                if actionButton then
-                    actionButton.Text = "Current Career"
-                    actionButton.BackgroundColor3 = COLORS.INFO
-                    actionButton.Active = false
-                end
-            else
-                warn("Failed to select career:", result)
             end
-        else
-            warn("SelectCareer remote function not found")
+        end
+        
+        -- Update action button
+        local actionButton = BaseUI.GetRef("modals", "career.actionButton")
+        if actionButton then
+            actionButton.Text = "Current Career"
+            actionButton.BackgroundColor3 = COLORS.INFO
+            actionButton.Active = false
         end
     else
-        warn("RemoteFunctions not found")
+        warn("Failed to select career:", message)
     end
 end
 

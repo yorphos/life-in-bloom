@@ -113,7 +113,10 @@ function HousingModal.Show()
         local contentContainer = BaseUI.GetRef("modals", "housing.content")
         if not contentContainer or not contentContainer.Parent then
             housingUpdateConnection:Disconnect()
-            return
+            housingUpdateConnection = nil
+            
+            -- Clean up references when modal is closed
+            BaseUI.RemoveRef("modals", "housing")
         end
         
         if activeSection == "Houses" and newHousingData then
@@ -347,9 +350,12 @@ function createHouseCard(house, parent, isOwned)
             local MainScreen = require(script.Parent.Parent.Screens.MainScreen)
             MainScreen.ShowNotification("Housing", "Teleporting to your property...", "info", 3)
             
-            -- Example remote event call (commented out)
-            -- local teleportEvent = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("TeleportToHouse")
-            -- teleportEvent:FireServer(house.Id)
+            -- Use PlayerDataController to handle teleporting to house
+            -- When uncommented, replace with:
+            -- local success, message = PlayerDataController.TeleportToHouse(house.Id)
+            -- if not success then
+            --     MainScreen.ShowNotification("Housing", message, "error", 3)
+            -- end
         else
             -- Implement purchase logic
             local MainScreen = require(script.Parent.Parent.Screens.MainScreen)
@@ -362,9 +368,14 @@ function createHouseCard(house, parent, isOwned)
                 
                 confirmPurchase.OnInvoke = function(response)
                     if response == "Yes" then
-                        -- Example remote event call (commented out)
-                        -- local purchaseEvent = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("PurchaseHouse")
-                        -- purchaseEvent:FireServer(house.Id)
+                        -- Use PlayerDataController to handle house purchase
+                        -- When uncommented, replace with:
+                        -- local success, message = PlayerDataController.PurchaseHouse(house.Id)
+                        -- if success then
+                        --     MainScreen.ShowNotification("Purchase", "Property purchase initiated!", "success", 3)
+                        -- else
+                        --     MainScreen.ShowNotification("Purchase", message, "error", 3)
+                        -- end
                         
                         MainScreen.ShowNotification("Purchase", "Property purchase initiated!", "success", 3)
                     end

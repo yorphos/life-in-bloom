@@ -644,25 +644,16 @@ end
 function useItem(itemId)
     print("Using item:", itemId)
     
-    -- This would typically call a remote function
-    local RemoteFunctions = ReplicatedStorage:FindFirstChild("RemoteFunctions")
-    if RemoteFunctions then
-        local UseItemFunc = RemoteFunctions:FindFirstChild("UseItem")
-        if UseItemFunc then
-            local success, result = pcall(function()
-                return UseItemFunc:InvokeServer(itemId)
-            end)
-            
-            if success and result then
-                print("Item used successfully:", result)
-            else
-                warn("Failed to use item:", result)
-            end
-        else
-            warn("UseItem remote function not found")
-        end
+    -- Get the item category from the selectedItem data
+    local category = selectedItem and selectedItem.category or "Consumables"
+    
+    -- Use the PlayerDataController to handle the remote call
+    local success, result = PlayerDataController.UseItem(category, itemId)
+    
+    if success then
+        print("Item used successfully:", result)
     else
-        warn("RemoteFunctions not found")
+        warn("Failed to use item:", result)
     end
 end
 
@@ -670,25 +661,16 @@ end
 function sellItem(itemId)
     print("Selling item:", itemId)
     
-    -- This would typically call a remote function
-    local RemoteFunctions = ReplicatedStorage:FindFirstChild("RemoteFunctions")
-    if RemoteFunctions then
-        local SellItemFunc = RemoteFunctions:FindFirstChild("SellItem")
-        if SellItemFunc then
-            local success, result = pcall(function()
-                return SellItemFunc:InvokeServer(itemId)
-            end)
-            
-            if success and result then
-                print("Item sold successfully for", result, "coins")
-            else
-                warn("Failed to sell item:", result)
-            end
-        else
-            warn("SellItem remote function not found")
-        end
+    -- Get the item category from the selectedItem data
+    local category = selectedItem and selectedItem.category or "Consumables"
+    
+    -- Use the PlayerDataController to handle the remote call
+    local success, result = PlayerDataController.SellItem(category, itemId)
+    
+    if success then
+        print("Item sold successfully for", result, "coins")
     else
-        warn("RemoteFunctions not found")
+        warn("Failed to sell item:", result)
     end
 end
 

@@ -7,6 +7,16 @@ local PlayerDataController = {}
 -- Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+-- Remote Events - directly exposed at the top level 
+PlayerDataController.InitialDataReceived = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("InitialDataReceived")
+PlayerDataController.StatChanged = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("StatChanged")
+PlayerDataController.InventoryChanged = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("InventoryChanged")
+PlayerDataController.JobCompleted = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("JobCompleted")
+PlayerDataController.CareerProgressUpdated = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("CareerProgressUpdated")
+
+-- Remote Functions
+PlayerDataController.GetPlayerData = ReplicatedStorage:WaitForChild("RemoteFunctions"):WaitForChild("GetPlayerData")
+
 -- Types
 local PlayerTypes = require(ReplicatedStorage.Shared.Types.PlayerTypes)
 type PlayerData = PlayerTypes.PlayerData
@@ -64,6 +74,11 @@ local temporaryData = {} -- For storing temporary UI state, not persisted
 
 -- Create an initialization event
 PlayerDataController.OnInitialized = Instance.new("BindableEvent")
+PlayerDataController.CareerChanged = Instance.new("BindableEvent")
+
+-- Variables for career tracking
+local currentCareer = nil
+local careerListeners = {}
 
 -- Process initial data from server
 function ProcessInitialData(data)
@@ -105,90 +120,17 @@ end
 local function SetupDataListeners()
     print("[CLIENT_INFO] Setting up data listeners...")
     
-    -- Retry logic for finding RemoteEvents folder
-    local maxRetries = 5
-    local retryDelay = 2 -- seconds
-    local RemoteEvents = nil
-    
-    for attempt = 1, maxRetries do
-        print("[CLIENT_INFO] Attempting to find RemoteEvents folder (Attempt " .. attempt .. "/" .. maxRetries .. ")")
-        local success, result = pcall(function()
-            return ReplicatedStorage:WaitForChild("RemoteEvents", retryDelay)
-        end)
-        
-        if success and result then
-            RemoteEvents = result
-            print("[CLIENT_INFO] Successfully found RemoteEvents folder")
-            break
-        end
-        
-        if attempt == maxRetries then
-            warn("[CLIENT_ERROR] Failed to find RemoteEvents folder after " .. maxRetries .. " attempts")
-            return false
-        end
-        
-        print("[CLIENT_INFO] RemoteEvents folder not found, retrying in " .. retryDelay .. " seconds...")
-        task.wait(retryDelay)
-    end
-    
-    if not RemoteEvents then
-        warn("[CLIENT_ERROR] RemoteEvents folder not found, initialization failed")
-        return false
-    end
-    
-    -- Listen for initial data with retry logic
-    local InitialDataEvent = nil
-    for attempt = 1, maxRetries do
-        print("[CLIENT_INFO] Attempting to find InitialDataReceived event (Attempt " .. attempt .. "/" .. maxRetries .. ")")
-        local success, result = pcall(function()
-            return RemoteEvents:WaitForChild("InitialDataReceived", retryDelay)
-        end)
-        
-        if success and result then
-            InitialDataEvent = result
-            print("[CLIENT_INFO] Successfully found InitialDataReceived event")
-            break
-        end
-        
-        if attempt == maxRetries then
-            warn("[CLIENT_ERROR] Failed to find InitialDataReceived event after " .. maxRetries .. " attempts")
-            -- Continue with other events even if this one fails
-        else
-            print("[CLIENT_INFO] InitialDataReceived event not found, retrying in " .. retryDelay .. " seconds...")
-            task.wait(retryDelay)
-        end
-    end
-    
-    if InitialDataEvent then
+    -- Connect to events directly from top-level properties
+    if PlayerDataController.InitialDataReceived then
         print("[CLIENT_INFO] Connected to InitialDataReceived event")
-        InitialDataEvent.OnClientEvent:Connect(ProcessInitialData)
+        PlayerDataController.InitialDataReceived.OnClientEvent:Connect(ProcessInitialData)
     else
         warn("[CLIENT_ERROR] InitialDataReceived event not found, some functionality may be limited")
     end
     
-    -- Listen for stat changes with similar retry logic
-    local StatChangedEvent = nil
-    for attempt = 1, maxRetries do
-        local success, result = pcall(function()
-            return RemoteEvents:WaitForChild("StatChanged", retryDelay)
-        end)
-        
-        if success and result then
-            StatChangedEvent = result
-            break
-        end
-        
-        if attempt == maxRetries then
-            warn("[CLIENT_ERROR] Failed to find StatChanged event after " .. maxRetries .. " attempts")
-            break
-        end
-        
-        task.wait(retryDelay)
-    end
-    
-    if StatChangedEvent then
+    if PlayerDataController.StatChanged then
         print("[CLIENT_INFO] Connected to StatChanged event")
-        StatChangedEvent.OnClientEvent:Connect(function(statName, newValue)
+        PlayerDataController.StatChanged.OnClientEvent:Connect(function(statName, newValue)
             if not cachedPlayerData.Stats then
                 cachedPlayerData.Stats = {
                     Currency = 0,
@@ -232,29 +174,9 @@ local function SetupDataListeners()
         warn("[CLIENT_ERROR] StatChanged event not found, stats updates will not work")
     end
     
-    -- Listen for inventory changes with retry logic
-    local InventoryChangedEvent = nil
-    for attempt = 1, maxRetries do
-        local success, result = pcall(function()
-            return RemoteEvents:WaitForChild("InventoryChanged", retryDelay)
-        end)
-        
-        if success and result then
-            InventoryChangedEvent = result
-            break
-        end
-        
-        if attempt == maxRetries then
-            warn("[CLIENT_ERROR] Failed to find InventoryChanged event after " .. maxRetries .. " attempts")
-            break
-        end
-        
-        task.wait(retryDelay)
-    end
-    
-    if InventoryChangedEvent then
+    if PlayerDataController.InventoryChanged then
         print("[CLIENT_INFO] Connected to InventoryChanged event")
-        InventoryChangedEvent.OnClientEvent:Connect(function(category, items)
+        PlayerDataController.InventoryChanged.OnClientEvent:Connect(function(inventoryType, itemData)
             if not cachedPlayerData.Inventory then
                 cachedPlayerData.Inventory = {
                     Clothing = {},
@@ -264,15 +186,15 @@ local function SetupDataListeners()
                 }
             end
             
-            cachedPlayerData.Inventory[category] = items
+            cachedPlayerData.Inventory[inventoryType] = itemData
             
             -- Notify category-specific inventory listeners
-            if dataListeners["Inventory_" .. category] then
-                for _, callback in ipairs(dataListeners["Inventory_" .. category]) do
+            if dataListeners["Inventory_" .. inventoryType] then
+                for _, callback in ipairs(dataListeners["Inventory_" .. inventoryType]) do
                     task.spawn(function()
-                        local success, err = pcall(callback, items)
+                        local success, err = pcall(callback, itemData)
                         if not success then
-                            warn("[CLIENT_ERROR] Error in inventory listener for " .. category .. ": " .. tostring(err))
+                            warn("[CLIENT_ERROR] Error in inventory listener for " .. inventoryType .. ": " .. tostring(err))
                         end
                     end)
                 end
@@ -295,59 +217,51 @@ local function SetupDataListeners()
     end
     
     -- Listen for career progress updates
-    local CareerProgressEvent = RemoteEvents:WaitForChild("CareerProgressUpdated", 5)
-    if CareerProgressEvent then
+    if PlayerDataController.CareerProgressUpdated then
         print("[CLIENT_INFO] Connected to CareerProgressUpdated event")
-        CareerProgressEvent.OnClientEvent:Connect(function(jobType, level, xp, nextLevelXP)
-            if not cachedPlayerData.Careers then
-                cachedPlayerData.Careers = {}
+        PlayerDataController.CareerProgressUpdated.OnClientEvent:Connect(function(careerId, level, experience, nextLevelXP)
+            print("[CLIENT_INFO] Career progress updated: " .. careerId .. ", Level: " .. level .. ", XP: " .. experience .. "/" .. nextLevelXP)
+            
+            -- Update current career if it matches
+            if currentCareer and currentCareer.id == careerId then
+                currentCareer.level = level
+                currentCareer.experience = experience
+                currentCareer.nextLevelXP = nextLevelXP
+                
+                -- Fire change event
+                PlayerDataController.CareerChanged:Fire(currentCareer)
             end
             
-            if not cachedPlayerData.Careers[jobType] then
-                cachedPlayerData.Careers[jobType] = {
-                    Level = 0,
-                    XP = 0,
-                    Stats = {
-                        CompletedJobs = 0,
-                        TimeSpent = 0,
-                        TotalEarnings = 0
-                    },
-                    Unlocks = {}
-                }
-            end
-            
-            cachedPlayerData.Careers[jobType].Level = level
-            cachedPlayerData.Careers[jobType].XP = xp
-            -- Store nextLevelXP in a temporary variable for UI purposes
-            -- since it's not part of the CareerData type
-            PlayerDataController.SetTemporaryData("NextLevelXP_" .. jobType, nextLevelXP)
-            
-            -- Notify listeners for this specific career
-            if dataListeners["Career_" .. jobType] then
-                for _, callback in ipairs(dataListeners["Career_" .. jobType]) do
+            -- Notify specific listeners
+            if careerListeners[careerId] then
+                for _, callback in ipairs(careerListeners[careerId]) do
                     task.spawn(function()
-                        local success, err = pcall(callback, cachedPlayerData.Careers[jobType])
+                        local success, err = pcall(function()
+                            callback(level, experience, nextLevelXP)
+                        end)
+                        
                         if not success then
-                            warn("[CLIENT_ERROR] Error in career listener for " .. jobType .. ": " .. tostring(err))
-                        end
-                    end)
-                end
-            end
-            
-            -- Notify general career listeners
-            if dataListeners["Careers"] then
-                for _, callback in ipairs(dataListeners["Careers"]) do
-                    task.spawn(function()
-                        local success, err = pcall(callback, cachedPlayerData.Careers)
-                        if not success then
-                            warn("[CLIENT_ERROR] Error in careers listener: " .. tostring(err))
+                            warn("[CLIENT_ERROR] Error in career listener: " .. tostring(err))
                         end
                     end)
                 end
             end
         end)
     else
-        warn("[CLIENT_WARNING] CareerProgressUpdated event not found (non-critical)")
+        warn("[CLIENT_ERROR] CareerProgressUpdated event not found, career updates will not work")
+    end
+    
+    -- Listen for job completions
+    if PlayerDataController.JobCompleted then
+        print("[CLIENT_INFO] Connected to JobCompleted event")
+        PlayerDataController.JobCompleted.OnClientEvent:Connect(function(jobId, reward, experience)
+            print("[CLIENT_INFO] Job completed: " .. jobId .. ", Reward: " .. reward .. ", XP: " .. experience)
+            
+            -- Handle job completion feedback (UI feedback is handled by MainUIController)
+            -- Notify listeners through existing data change system
+        end)
+    else
+        warn("[CLIENT_ERROR] JobCompleted event not found, job completion notifications will not work")
     end
     
     return true
@@ -608,6 +522,147 @@ function PlayerDataController.TriggerDataListeners(category: string, data: any):
             end
         end)
     end
+end
+
+-- Get the player's current active career
+function PlayerDataController.GetCurrentCareer()
+    if not currentCareer then
+        -- Try to load from cached data
+        local careerData = PlayerDataController.GetDataByPath("Career.Current")
+        if careerData then
+            currentCareer = careerData
+        end
+    end
+    
+    return currentCareer
+end
+
+-- Listen for changes to a specific career
+function PlayerDataController.ListenForCareerProgress(careerId, callback)
+    if not careerListeners[careerId] then
+        careerListeners[careerId] = {}
+    end
+    
+    table.insert(careerListeners[careerId], callback)
+    
+    -- Return disconnect function
+    return function()
+        local index = table.find(careerListeners[careerId], callback)
+        if index then
+            table.remove(careerListeners[careerId], index)
+        end
+    end
+end
+
+-- Request to start a job (stub for future implementation)
+function PlayerDataController.StartJob(jobId)
+    -- This would typically use a remote function
+    print("[CLIENT_INFO] StartJob not yet implemented")
+    return false, "Not implemented"
+end
+
+-- Select a career for the player
+function PlayerDataController.SelectCareer(careerId: string): (boolean, string)
+    -- Ensure RemoteFunctions exists
+    local RemoteFunctions = ReplicatedStorage:WaitForChild("RemoteFunctions", 5)
+    if not RemoteFunctions then
+        return false, "[CLIENT_ERROR] RemoteFunctions folder not found"
+    end
+    
+    -- Get select career function
+    local SelectCareerFunc = RemoteFunctions:FindFirstChild("SelectCareer")
+    if not SelectCareerFunc then
+        return false, "[CLIENT_ERROR] SelectCareer function not found"
+    end
+    
+    -- Call server
+    local success, result = pcall(function()
+        return SelectCareerFunc:InvokeServer(careerId)
+    end)
+    
+    if not success then
+        return false, "[CLIENT_ERROR] Error selecting career: " .. tostring(result)
+    end
+    
+    -- Update current career if selection was successful
+    if result then
+        -- We'll need to refresh career data
+        task.spawn(function()
+            PlayerDataController.RefreshData("Careers")
+        end)
+    end
+    
+    return true, "Career selected successfully"
+end
+
+-- Sell an item from the player's inventory
+function PlayerDataController.SellItem(category: string, itemId: string): (boolean, string | number)
+    -- Ensure RemoteFunctions exists
+    local RemoteFunctions = ReplicatedStorage:WaitForChild("RemoteFunctions", 5)
+    if not RemoteFunctions then
+        return false, "[CLIENT_ERROR] RemoteFunctions folder not found"
+    end
+    
+    -- Get sell item function
+    local SellItemFunc = RemoteFunctions:FindFirstChild("SellItem")
+    if not SellItemFunc then
+        return false, "[CLIENT_ERROR] SellItem function not found"
+    end
+    
+    -- Call server
+    local success, result = pcall(function()
+        return SellItemFunc:InvokeServer(category, itemId)
+    end)
+    
+    if not success then
+        return false, "[CLIENT_ERROR] Error selling item: " .. tostring(result)
+    end
+    
+    return true, result  -- result should be the amount of currency received
+end
+
+-- Teleport to a owned house (placeholder implementation)
+function PlayerDataController.TeleportToHouse(houseId: string): (boolean, string)
+    -- Ensure RemoteEvents exists
+    local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents", 5)
+    if not RemoteEvents then
+        return false, "[CLIENT_ERROR] RemoteEvents folder not found"
+    end
+    
+    -- Get teleport event
+    local TeleportEvent = RemoteEvents:FindFirstChild("TeleportToHouse")
+    if not TeleportEvent then
+        return false, "[CLIENT_ERROR] TeleportToHouse event not found"
+    end
+    
+    -- Fire server event
+    TeleportEvent:FireServer(houseId)
+    
+    -- Since this is a FireServer call, we don't know immediately if it succeeded
+    -- We assume success and let the server handle any errors
+    return true, "Teleport request sent to server"
+end
+
+-- Purchase a house (placeholder implementation)
+function PlayerDataController.PurchaseHouse(houseId: string): (boolean, string)
+    -- Ensure RemoteEvents exists
+    local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents", 5)
+    if not RemoteEvents then
+        return false, "[CLIENT_ERROR] RemoteEvents folder not found"
+    end
+    
+    -- Get purchase event
+    local PurchaseEvent = RemoteEvents:FindFirstChild("PurchaseHouse")
+    if not PurchaseEvent then
+        return false, "[CLIENT_ERROR] PurchaseHouse event not found"
+    end
+    
+    -- Fire server event
+    PurchaseEvent:FireServer(houseId)
+    
+    -- Since this is a FireServer call, we don't know immediately if it succeeded
+    -- We assume success and let the server handle any errors
+    return true, "Purchase request sent to server"
 end
 
 return PlayerDataController 

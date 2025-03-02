@@ -753,7 +753,7 @@ function createDropdown(name, parent, options, initialValue, onChange)
     local dropdownButton = Instance.new("TextButton")
     dropdownButton.Name = "Button"
     dropdownButton.Size = UDim2.new(1, 0, 1, 0)
-    dropdownButton.BackgroundColor3 = COLORS.BUTTON
+    dropdownButton.BackgroundColor3 = COLORS.BACKGROUND
     dropdownButton.BorderSizePixel = 0
     dropdownButton.Text = ""
     dropdownButton.Parent = dropdownContainer
@@ -792,7 +792,7 @@ function createDropdown(name, parent, options, initialValue, onChange)
     optionsContainer.Name = "Options"
     optionsContainer.Size = UDim2.new(1, 0, 0, #options * 30)
     optionsContainer.Position = UDim2.new(0, 0, 1, 5)
-    optionsContainer.BackgroundColor3 = COLORS.CARD_BG
+    optionsContainer.BackgroundColor3 = COLORS.BACKGROUND
     optionsContainer.BorderSizePixel = 0
     optionsContainer.Visible = false
     optionsContainer.ZIndex = 10

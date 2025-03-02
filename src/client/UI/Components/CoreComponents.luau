@@ -103,7 +103,12 @@ function CoreComponents.CreateProgressBar(name, initialValue, maxValue, color, s
     -- Progress fill
     local fill = Instance.new("Frame")
     fill.Name = "Fill"
-    fill.Size = UDim2.new(initialValue / maxValue, 0, 1, 0)
+    -- Add safety check to ensure valid values for division
+    local percent = 0
+    if maxValue and maxValue > 0 and initialValue then
+        percent = math.clamp(initialValue / maxValue, 0, 1)
+    end
+    fill.Size = UDim2.new(percent, 0, 1, 0)
     fill.BackgroundColor3 = color or COLORS.PRIMARY
     fill.BorderSizePixel = 0
     fill.Parent = container
@@ -113,20 +118,44 @@ function CoreComponents.CreateProgressBar(name, initialValue, maxValue, color, s
     fillCorner.CornerRadius = UDim.new(0, 4)
     fillCorner.Parent = fill
     
+    -- Add text label to display progress
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Name = "ProgressText"
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = string.format("%d / %d (%d%%)", initialValue, maxValue, math.floor((initialValue / maxValue) * 100))
+    textLabel.TextColor3 = COLORS.TEXT
+    textLabel.Font = Enum.Font.GothamBold
+    textLabel.TextSize = 12
+    textLabel.TextXAlignment = Enum.TextXAlignment.Center
+    textLabel.ZIndex = 2 -- Ensure text appears above the fill
+    textLabel.Parent = container
+    
     if parent then
         container.Parent = parent
     end
     
     -- Function to update the progress bar
-    local function updateProgress(value, max)
-        local percent = value / max
+    local function updateProgress(value, max, formattedText)
+        local percent = 0
+        if max and max > 0 and value then
+            percent = math.clamp(value / max, 0, 1)
+        end
         TweenService:Create(fill, TWEEN_INFO, {Size = UDim2.new(percent, 0, 1, 0)}):Play()
+        
+        -- Update the text if provided, otherwise use default format
+        if formattedText then
+            textLabel.Text = formattedText
+        else
+            textLabel.Text = string.format("%d / %d (%d%%)", value or 0, max or 0, math.floor(percent * 100))
+        end
     end
     
     -- Return the container and update function
     return {
         container = container,
         fill = fill,
+        textLabel = textLabel,
         updateProgress = updateProgress
     }
 end

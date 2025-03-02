@@ -8,6 +8,11 @@ local GameDataController = {}
 -- Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+-- Remote Functions - directly exposed at the top level
+GameDataController.GetGameData = ReplicatedStorage:WaitForChild("RemoteFunctions"):WaitForChild("GetGameData")
+GameDataController.PurchaseItem = ReplicatedStorage:WaitForChild("RemoteFunctions"):WaitForChild("PurchaseItem")
+GameDataController.UseItem = ReplicatedStorage:WaitForChild("RemoteFunctions"):WaitForChild("UseItem")
+
 -- Data caches
 local cachedData = {
     Careers = nil,
@@ -48,23 +53,14 @@ end
 
 -- Helper function to invoke the remote function
 local function InvokeGameDataFunction(dataType, specificId)
-    -- Ensure RemoteFunctions folder exists
-    local remoteFunctions = ReplicatedStorage:FindFirstChild("RemoteFunctions")
-    if not remoteFunctions then
-        warn("[GAME_DATA] RemoteFunctions folder not found")
-        return nil
-    end
-    
-    -- Get the GetGameData function
-    local getGameDataFunc = remoteFunctions:FindFirstChild("GetGameData")
-    if not getGameDataFunc then
+    if not GameDataController.GetGameData then
         warn("[GAME_DATA] GetGameData function not found")
         return nil
     end
     
-    -- Call the function
+    -- Call the function directly from controller property
     local success, result = pcall(function()
-        return getGameDataFunc:InvokeServer(dataType, specificId)
+        return GameDataController.GetGameData:InvokeServer(dataType, specificId)
     end)
     
     if not success then
@@ -232,6 +228,49 @@ function GameDataController.CanSelectCareer(careerId)
     end
     
     return true
+end
+
+-- Purchase an item using the direct remote function
+function GameDataController.Purchase(itemId, quantity, options)
+    if not GameDataController.PurchaseItem then
+        warn("[GAME_DATA] PurchaseItem function not found")
+        return false, "Remote function not available"
+    end
+    
+    quantity = quantity or 1
+    options = options or {}
+    
+    local success, result = pcall(function()
+        return GameDataController.PurchaseItem:InvokeServer(itemId, quantity, options)
+    end)
+    
+    if not success then
+        warn("[GAME_DATA] Error purchasing item: " .. tostring(result))
+        return false, "Error processing purchase"
+    end
+    
+    return success, result
+end
+
+-- Use an item using the direct remote function
+function GameDataController.Use(itemId, targetId, options)
+    if not GameDataController.UseItem then
+        warn("[GAME_DATA] UseItem function not found")
+        return false, "Remote function not available"
+    end
+    
+    options = options or {}
+    
+    local success, result = pcall(function()
+        return GameDataController.UseItem:InvokeServer(itemId, targetId, options)
+    end)
+    
+    if not success then
+        warn("[GAME_DATA] Error using item: " .. tostring(result))
+        return false, "Error using item"
+    end
+    
+    return success, result
 end
 
 return GameDataController 
