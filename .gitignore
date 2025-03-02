@@ -1,0 +1,10 @@
+# Project place file
+/*.rbxlx
+/*.rbxl
+
+# Roblox Studio lock files
+/*.rbxlx.lock
+/*.rbxl.lock
+
+# IDE files
+/.cursor/
